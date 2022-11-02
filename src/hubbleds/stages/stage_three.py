@@ -602,8 +602,8 @@ class StageThree(HubbleStage):
         self.story_state.on_class_data_update(self._on_class_data_update)
         self.story_state.on_student_data_update(self._on_student_data_update)
 
-        self.reset_limits_timer = RepeatedTimer(5, self.reset_viewer_limits)
-        self.reset_limits_timer.start()
+        # self.reset_limits_timer = RepeatedTimer(5, self.reset_viewer_limits)
+        # self.reset_limits_timer.start()
     
     def _on_marker_update(self, old, new):
         if not self.trigger_marker_update_cb:

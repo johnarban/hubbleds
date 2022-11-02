@@ -334,7 +334,7 @@ class StageOne(HubbleStage):
             spectrum_viewer.toolbar.set_tool_enabled("hubble:wavezoom", True)
             spectrum_viewer.toolbar.set_tool_enabled("cds:home", True)
         
-        
+        self.vue_fill_data()
             
 
     def _on_measurements_changed(self, msg):
