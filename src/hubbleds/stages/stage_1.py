@@ -123,7 +123,7 @@ class StageState(CDSState):
         'dop_cal5',
         'osm_tut',
         'smt_tut',
-        'rep_rem1',
+        'rem_gal1',
         'ref_dat1',
         'dop_cal6',
     ])
@@ -154,7 +154,7 @@ class StageState(CDSState):
         'res_wav1',
         'obs_wav1',
         'obs_wav2',
-        'rep_rem1',
+        'rem_gal1',
         'ref_dat1',
         'dop_cal0',
         'dop_cal1',

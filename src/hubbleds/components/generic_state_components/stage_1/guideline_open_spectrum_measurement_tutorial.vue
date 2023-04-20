@@ -2,7 +2,7 @@
   <scaffold-alert
     title-text="Choose a Row"
     @back="() => { state.marker = 'dop_cal5'; }"
-    @next="() => { if (state.marker === 'osm_tut') {state.marker = 'smt_tut';} else if (state.marker === 'smt_tut') {state.marker = 'rep_rem1';} }"
+    @next="() => { if (state.marker === 'osm_tut') {state.marker = 'smt_tut';} else if (state.marker === 'smt_tut') {state.marker = 'rem_gal1';} }"
     :next-text="state.marker === 'osm_tut' ? 'Open Comparison' : 'Next'"
   >
 

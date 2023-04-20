@@ -15,7 +15,7 @@
     </template>  
   <div class="mb-4">
       <p>
-      For the moment, we have replaced your chosen galaxies with the example galaxy in the table.
+      For the moment, we have replaced the galaxies in your table with the example galaxy.
       </p>
       <p>
       Click the row containing the example galaxy to select it.

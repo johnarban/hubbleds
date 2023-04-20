@@ -14,7 +14,7 @@
     <div
       class="mb-4"
     >
-      Let's now turn to professional astronomers' data and see how that compares to your class's data (in teal).
+      Let's now turn to professional astronomers' data and see how that compares to your class's data.
     </div>
   </guideline-professional-data>
 </template>

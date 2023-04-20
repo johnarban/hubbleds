@@ -22,7 +22,7 @@
       <strong>There is no right answer.</strong> The Universe doesn’t come with an answer key. There are only results which you may have more or less confidence in.
     </p>
     <p>
-      Science is always moving forward and there is always more humans can learn about our universe. Follow NASA to learn what new discoveries will be made by HST's successor, the James Webb Space Telescope!
+      Science is always moving forward and there is always more humans can learn about our universe. Follow NASA to learn what new discoveries are being made by HST's successor, the James Webb Space Telescope!
     </p>
   </scaffold-alert>
 </template>

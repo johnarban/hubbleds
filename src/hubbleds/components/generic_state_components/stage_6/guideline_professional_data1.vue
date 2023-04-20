@@ -4,7 +4,7 @@
     class="mb-4 mx-auto"
     max-width="800"
     elevation="6"
-    header-text="Professional Data"
+    title-text="Professional Data"
     prev-marker="pro_dat0"
     next-marker="pro_dat2"
     :state="state"
@@ -15,7 +15,7 @@
       class="mb-4"
     >
     <p>
-      Edwin Hubble's own data from 1929 is shown in purple. (Your class's data is shown in teal).
+      Edwin Hubble's own data from 1929 is shown in purple. (Your class's data is shown in blue).
     </p>
 
     <p>

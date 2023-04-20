@@ -405,7 +405,7 @@ class StageThree(HubbleStage):
 
     def _update_hypgal_info(self):
         data = self.get_data(STUDENT_DATA_LABEL)
-        indices = where(data["name"] == BEST_FIT_GALAXY_NAME)
+        indices = where(data[NAME_COMPONENT] == BEST_FIT_GALAXY_NAME)
         if indices[0]:
             index = indices[0][0]
             self.stage_state.hypgal_velocity = data[VELOCITY_COMPONENT][index]

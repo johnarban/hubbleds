@@ -36,13 +36,10 @@
       v-if="state.gals_total < 5 & state.gal_selected"
     >
       <p>
-        What do you think of this galaxy?
+        If this galaxy looks good to you, click <v-btn icon dark x-small disabled class="mx-1 black--text" elevation="2" style="background-color: #00E676;"><v-icon style="color:black!important;">mdi-plus</v-icon></v-btn> to add it to your data set.
       </p>
       <p>
-        If it looks good to you, add it to your galaxy collection.
-      </p>
-      <p>
-        If you’d rather look for another galaxy, reset the view and choose a different green dot.
+        If you’d rather look for another galaxy, click <v-btn icon dark x-small disabled class="mx-1 black--text" elevation="2" style="background-color: #00E676;"><v-icon style="color:black!important;">mdi-cached</v-icon></v-btn> to reset the view and choose a different green dot.
       </p>
     </div>
     <div
@@ -72,7 +69,7 @@
         Great, you have all the galaxies that you need and you're now ready to begin making measurements from your data.
       </p>
       <p>
-        Let's learn how to measure a galaxy's velocity using it's light spectrum. 
+        Let's learn how to measure a galaxy's velocity using its light spectrum. 
       </p>
     </div>
   </scaffold-alert>

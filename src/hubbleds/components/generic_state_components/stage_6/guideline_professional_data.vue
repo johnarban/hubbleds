@@ -5,7 +5,6 @@
     class="mb-4 mx-auto"
     max-width="800"
     elevation="6"
-    header-text="Professional Data"
     @back="retreat()"
     @next="advance()"
     :allow-back="allowBack"

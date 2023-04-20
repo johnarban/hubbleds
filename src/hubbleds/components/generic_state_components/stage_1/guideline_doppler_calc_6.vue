@@ -11,31 +11,18 @@
       @back="() => { state.marker_backward = 1; }"
       @next="() => { state.completed = true; }"
   >
-    <!-- <template #before-next>
-      Click the <v-icon>mdi-run-fast</v-icon> icon.
-    </template> -->
+    <template #before-next>
+      Click <v-btn icon tile dark x-small disabled class="mx-1" elevation="2" style="background-color: #0277BD; border-radius: 5px;"><v-icon style="color:white!important;">mdi-run-fast</v-icon></v-btn> button
+    </template>
 
     <div
         v-if="state.velocities_total < 5"
-        v-intersect="(entries, _observer, intersecting) => {
-        if (!intersecting) return;
-        const targets = entries.filter(entry => entry.isIntersecting).map(entry => entry.target);
-        MathJax.typesetPromise(targets);            
-      }"
         class="mb-4"
     >
       <p>
-        Notice your calculated velocity is now entered in the table.
-      </p>
-      <div
-          class="JaxEquation"
-      >
-        $$ v = {{ state.student_vel.toFixed(0).toLocaleString() }} \text{ km/s}$$
-      </div>
-      <p>
-        Since know how to use the Doppler equation, click the
+        Since you've already seen how to use the Doppler equation, click the
         <v-btn icon tile dark x-small disabled class="mx-1" elevation="2" style="background-color: #0277BD; border-radius: 5px;"><v-icon style="color:white!important;">mdi-run-fast</v-icon></v-btn>
-        icon in the table header to have the velocities of the remaining galaxies calculated as well.
+        icon in the table header to have the velocities of your galaxies calculated.
       </p>
     </div>
     <div

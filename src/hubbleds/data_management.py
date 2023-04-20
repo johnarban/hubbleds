@@ -97,6 +97,9 @@ DB_SUMMARY_FIELDS = [
     DB_AGE_FIELD
 ]
 
+# Misc
+SPECTRUM_EXTENSION = ".fits"
+
 def reverse(d):
     return { v : k for k, v in d.items() }
 

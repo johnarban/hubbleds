@@ -16,19 +16,19 @@
         You entered:
       </p>
       <v-card
-        class="JaxEquation pa-3"
+        class="JaxEquation pa-3 entered-card"
         color="info lighten-1"
         elevation="0"
       >
-        $$ t = {{ Math.round(state.age_const) }}  \times \frac{\textcolor{black}{\colorbox{#FFAB91}{ {{ (state.hypgal_distance).toFixed(0) }} } } \text{ Mpc} } { \textcolor{black}{\colorbox{#FFAB91}{ {{ (state.hypgal_velocity).toFixed(0) }} } }  \text{ km/s} }  \text{   Gyr}$$
+        {{ youEnteredMJax(state.hypgal_distance, state.hypgal_velocity) }}
       </v-card>    
       <p class="mt-4">
         Dividing through gives an estimated age of the universe from your dataset:
       </p>
       <div
-        class="JaxEquation my-8"
+        class="JaxEquation my-8 est-age"
       >
-        $$ D = {{ (Math.round(state.age_const * state.hypgal_distance/state.hypgal_velocity).toFixed(0) ) }} \text{ Gyr} $$
+        {{ estAgeMJax(state.hypgal_distance, state.hypgal_velocity) }}
       </div>
       <v-divider role="presentation" class="mt-3"></v-divider>
       <v-card
@@ -54,7 +54,6 @@
             class="my-1"
           >
             <v-col
-              
             >
               \(t\)
             </v-col>
@@ -136,6 +135,47 @@ mjx-mstyle {
 
 <script>
 module.exports = {
-  props: ['state']
+  props: ['state'],
+  data() {
+    return {
+      enteredJax: this.youEnteredMJax(this.state.hypgal_distance, this.state.hypgal_velocity),
+      ageJax: this.estAgeMJax(this.state.hypgal_distance, this.state.hypgal_velocity)
+    }
+  },
+  methods: {
+    youEnteredMJax(distance, velocity) {
+      return `$$ t = ${Math.round(this.state.age_const)}  \\times \\frac{\\textcolor{black}{\\colorbox{#FFAB91}{ ${distance.toFixed(0)} } } \\text{ Mpc} } { \\textcolor{black}{\\colorbox{#FFAB91}{ ${velocity.toFixed(0)} } }  \\text{ km/s} }  \\text{   Gyr}$$`
+    },
+    estAgeMJax(distance, velocity) {
+      return `$$ D = ${Math.round(this.state.age_const * distance / velocity).toFixed(0)} \\text{ Gyr} $$`;
+    },
+    removeMathJax(container) {
+      container.querySelectorAll("mjx-container").forEach(el => container.remove(el));
+    },
+    resetMathJax(containers, newJax) {
+      containers.forEach((container, index) => {
+        container.textContent = newJax[index];
+        this.removeMathJax(container);
+      });
+      MathJax.typesetPromise(containers);
+    },
+    resetAllMathJax(distance, velocity) {
+      const containers = [".entered-card", ".est-age"].map(sel => this.$el.querySelector(sel));
+      const newJax = [this.youEnteredMJax(distance, velocity), this.estAgeMJax(distance, velocity)];
+      this.resetMathJax(containers, newJax);
+    }
+  },
+  watch: {
+    'state.hypgal_distance': {
+      handler(distance) {
+        this.resetAllMathJax(distance, this.state.hypgal_velocity);
+      }
+    },
+    'state.hypgal_velocity': {
+      handler(velocity) {
+        this.resetAllMathJax(this.state.hypgal_distance, velocity);
+      }
+    }
+  }
 }
 </script>

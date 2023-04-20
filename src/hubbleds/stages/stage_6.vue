@@ -23,7 +23,7 @@
     >
       <v-col
         cols="12"
-        lg = "5"
+        lg = "4"
       >
         <guideline-professional-data0
           v-if="stage_state.marker == 'pro_dat0'"
@@ -82,17 +82,28 @@
       </v-col>
       <v-col
         cols="12"
-        lg="7"
+        lg="8"
       >
-        <v-card
-          :color="'black'"
-          :class="'pa-0'"
-          outlined
-        >
-          <v-lazy>
+        <v-row>
+          <v-col cols="3">
+            <v-card
+              color="#385F73"
+            >
+              <py-layer-toggle/>
+            </v-card>
+          </v-col>
+          <v-col>
+            <v-card
+              :color="'black'"
+              :class="'pa-0'"
+              outlined
+            >
+              <v-lazy>
             <jupyter-widget :widget="viewers.prodata_viewer"/>
-          </v-lazy>
-        </v-card>
+              </v-lazy>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>

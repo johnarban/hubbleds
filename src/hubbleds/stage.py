@@ -7,7 +7,7 @@ from cosmicds.phases import Stage
 from cosmicds.utils import API_URL, CDSJSONEncoder
 from echo import add_callback
 
-from .data_management import MEAS_TO_STATE, STUDENT_MEASUREMENTS_LABEL, UNITS_TO_STATE
+from .data_management import *
 from .utils import HUBBLE_ROUTE_PATH, distance_from_angular_size, velocity_from_wavelengths
 
 
@@ -27,10 +27,9 @@ class HubbleStage(Stage):
         prepared = {HubbleStage._map_key(k): measurement.get(k, None) for k in
                     MEAS_TO_STATE.keys()}
         prepared.update(UNITS_TO_STATE)
-        prepared["student_id"] = self.app_state.student["id"]
-        ext = ".fits"
-        if not prepared["galaxy_name"].endswith(ext):
-            prepared["galaxy_name"] += ext
+        prepared[DB_STUDENT_ID_FIELD] = self.app_state.student["id"]
+        if not prepared[DB_GALNAME_FIELD].endswith(SPECTRUM_EXTENSION):
+            prepared[DB_GALNAME_FIELD] += SPECTRUM_EXTENSION
         prepared = json.loads(json.dumps(prepared, cls=CDSJSONEncoder))
         return prepared
     
@@ -39,10 +38,9 @@ class HubbleStage(Stage):
         prepared = {HubbleStage._map_key(k): measurement.get(k, None) for k in
                     MEAS_TO_STATE.keys()}
         prepared.update(UNITS_TO_STATE)
-        prepared["student_id"] = self.app_state.student["id"]
-        ext = ".fits"
-        if not prepared["galaxy_name"].endswith(ext):
-            prepared["galaxy_name"] += ext
+        prepared[DB_STUDENT_ID_FIELD] = self.app_state.student["id"]
+        if not prepared[DB_GALNAME_FIELD].endswith(SPECTRUM_EXTENSION):
+            prepared[DB_GALNAME_FIELD] += SPECTRUM_EXTENSION
         prepared = json.loads(json.dumps(prepared, cls=CDSJSONEncoder))
         return prepared
 
@@ -65,9 +63,9 @@ class HubbleStage(Stage):
     def remove_measurement(self, galaxy_name):
         name = str(galaxy_name)
         condition = lambda x: x == name
-        if not galaxy_name.endswith(".fits"):
-            galaxy_name += ".fits"
-        self.remove_data_values("student_measurements", "name", condition,
+        if not galaxy_name.endswith(SPECTRUM_EXTENSION):
+            galaxy_name += SPECTRUM_EXTENSION
+        self.remove_data_values(STUDENT_MEASUREMENTS_LABEL, NAME_COMPONENT, condition,
                                 single=True)
         user = self.app_state.student
         if self.app_state.update_db and user.get("id", None) is not None:
@@ -83,18 +81,18 @@ class HubbleStage(Stage):
         # Update dependent values, if the student has already has a value for them
         # We block submission to avoid sending unnecessary requests
         data = self.data_collection[dc_name]
-        if comp_name == "measwave":
-            velocity = data["velocity"][index]
+        if comp_name == MEASWAVE_COMPONENT:
+            velocity = data[VELOCITY_COMPONENT][index]
             if velocity is not None:
-                rest = data["restwave"][index]
+                rest = data[RESTWAVE_COMPONENT][index]
                 new_velocity = velocity_from_wavelengths(value, rest)
-                self.update_data_value(dc_name, "velocity", new_velocity, index, block_submit=True)
+                self.update_data_value(dc_name, VELOCITY_COMPONENT, new_velocity, index, block_submit=True)
 
-        if comp_name == "angular_size":
-            distance = data["distance"][index]
+        if comp_name == ANGULAR_SIZE_COMPONENT:
+            distance = data[DISTANCE_COMPONENT][index]
             if distance is not None:
                 new_distance = distance_from_angular_size(value)
-                self.update_data_value(dc_name, "distance", new_distance, index, block_submit=True)
+                self.update_data_value(dc_name, DISTANCE_COMPONENT, new_distance, index, block_submit=True)
 
         # Submit a measurement, if necessary
         if self.app_state.update_db \

@@ -20,10 +20,10 @@
       v-if="state.obswaves_total < 5"
     >
       <p>
-        Your measurement of the line’s observed wavelength is now recorded in the table for your selected galaxy.
+        Now that you've seen how to measure spectral wavelengths, let's return to the 5 galaxies you selected earlier.
       </p>
       <p>
-        Go through each of the remaining galaxies in your table and repeat these measurements, until you have recorded rest and observed wavelengths for each of your galaxies.
+        Click on each galaxy in your table and repeat the spectral line wavelength measurement for each of them.
       </p>
     </div>
     <div

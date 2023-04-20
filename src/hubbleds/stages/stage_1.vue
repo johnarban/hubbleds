@@ -108,6 +108,11 @@
           v-intersect.once="scrollIntoView"
           :state="stage_state"
         />
+        <guideline-doppler-calc-6
+          v-if="stage_state.marker === 'dop_cal6'"
+          v-intersect.once="scrollIntoView"
+          :state="stage_state"
+        />
       </v-col>
       <v-col
         cols="12"
@@ -118,7 +123,7 @@
           :color="stage_state.table_highlights.includes(stage_state.marker) ? 'info' : 'black'"
           :class="stage_state.table_highlights.includes(stage_state.marker) ? 'pa-1 my-n1' : 'pa-0'"
           outlined
-          v-if="stage_state.show_galaxy_table || ((stage_state.indices[stage_state.marker] < stage_state.indices['cho_row1'])  || (stage_state.indices[stage_state.marker] >= stage_state.indices['rep_rem1']) )"
+          v-if="stage_state.show_galaxy_table || ((stage_state.indices[stage_state.marker] < stage_state.indices['cho_row1'])  || (stage_state.indices[stage_state.marker] >= stage_state.indices['rem_gal1']) )"
         > 
           <jupyter-widget  :widget="widgets.galaxy_table"/>
         </v-card>
@@ -126,7 +131,7 @@
           :color="stage_state.table_highlights.includes(stage_state.marker) ? 'info' : 'black'"
           :class="stage_state.table_highlights.includes(stage_state.marker) ? 'pa-1 my-n1' : 'pa-0'"
           outlined
-          v-if="stage_state.show_example_galaxy_table || ((stage_state.indices[stage_state.marker] >= stage_state.indices['cho_row1'])  && (stage_state.indices[stage_state.marker] < stage_state.indices['rep_rem1']) )" 
+          v-if="stage_state.show_example_galaxy_table || ((stage_state.indices[stage_state.marker] >= stage_state.indices['cho_row1'])  && (stage_state.indices[stage_state.marker] < stage_state.indices['rem_gal1']) )" 
         > 
           <jupyter-widget :widget="widgets.example_galaxy_table"/>
         </v-card>
@@ -162,18 +167,13 @@
           v-intersect.once="scrollIntoView"
           :state="stage_state"
         />
-        <guideline-doppler-calc-6
-          v-if="stage_state.marker === 'dop_cal6'"
-          v-intersect.once="scrollIntoView"
-          :state="stage_state"
-        />
         <guideline-open-spectrum-measurement-tutorial
           v-if="stage_state.marker === 'osm_tut' || stage_state.marker === 'smt_tut'"
           v-intersect.once="scrollIntoView"
           :state="stage_state"
         />
         <guideline-remaining-gals
-          v-if="stage_state.marker === 'rep_rem1'"
+          v-if="stage_state.marker === 'rem_gal1'"
           v-intersect.once="scrollIntoView"
           :state="stage_state"
         />
@@ -229,7 +229,7 @@
           >
             <!-- REFLECTION Dialog -->
             <reflect-velocity-windows
-              v-if="(stage_state.obswaves_total >= 5) && !(stage_state.marker === 'rep_rem1')"
+              v-if="(stage_state.obswaves_total >= 5) && !(stage_state.marker === 'rem_gal1')"
               button-text="reflect"
               close-text="submit"
               :state="stage_state"
@@ -242,7 +242,7 @@
             </reflect-velocity-windows>
             <!-- Placeholder for Reflection button -->
             <v-btn
-              v-if="(stage_state.obswaves_total < 5) || (stage_state.marker === 'rep_rem1')"
+              v-if="(stage_state.obswaves_total < 5) || (stage_state.marker === 'rem_gal1')"
               disabled
               block
               color="info"

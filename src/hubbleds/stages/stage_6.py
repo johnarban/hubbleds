@@ -3,8 +3,10 @@ from pathlib import Path
 
 from echo import CallbackProperty, add_callback, callback_property
 from glue.core.message import NumericalDataChangedMessage
+from glue.core import Subset
 from traitlets import Bool, default
 
+from cosmicds.components.layer_toggle import LayerToggle
 from cosmicds.phases import CDSState
 from cosmicds.registries import register_stage
 from cosmicds.utils import (RepeatedTimer, extend_tool, load_template,
@@ -128,6 +130,16 @@ class StageFive(HubbleStage):
                                          "Professional Data")
         prodata_viewer.toolbar.set_tool_enabled("hubble:linefit", False)
         prodata_viewer.figure.axes[1].label_offset = "5em"
+
+        layer_toggle = LayerToggle(prodata_viewer, names={
+            STUDENT_DATA_LABEL: "My Data",
+            CLASS_DATA_LABEL: "Class Data",
+            HUBBLE_1929_DATA_LABEL: "Hubble 1929 Data",
+            HUBBLE_KEY_DATA_LABEL: "HST Key Project 2001 Data"
+        })
+        self.ignore_slider_layer = lambda layer_state: layer_state.layer.label == "student_slider_subset"
+        layer_toggle.add_ignore_condition(self.ignore_slider_layer)
+        self.add_component(layer_toggle, label="py-layer-toggle")    
         
         self.setup_prodata_viewer()
         
@@ -154,7 +166,7 @@ class StageFive(HubbleStage):
         # Set up links between various data sets
 
         for field in [DISTANCE_COMPONENT, VELOCITY_COMPONENT]:
-            self.add_link(CLASS_DATA_LABEL, field, ALL_DATA_LABEL, field)
+            self.add_link(CLASS_DATA_LABEL, field, STUDENT_DATA_LABEL, field)
         self.add_link(HUBBLE_1929_DATA_LABEL, 'Distance (Mpc)', HUBBLE_KEY_DATA_LABEL,
                       'Distance (Mpc)')
         self.add_link(HUBBLE_1929_DATA_LABEL, 'Tweaked Velocity (km/s)', HUBBLE_KEY_DATA_LABEL,
@@ -163,8 +175,21 @@ class StageFive(HubbleStage):
                       DISTANCE_COMPONENT)
         self.add_link(HUBBLE_KEY_DATA_LABEL, 'Velocity (km/s)', STUDENT_DATA_LABEL,
                       VELOCITY_COMPONENT)
-        
+
+        # Avoid picking up subsets of the different layers.
+        prodata_viewer.ignore(lambda layer: layer.label not in [STUDENT_DATA_LABEL, CLASS_DATA_LABEL, HUBBLE_KEY_DATA_LABEL, HUBBLE_1929_DATA_LABEL] and isinstance(layer, Subset))
+
         # load data into the viewer and style
+        prodata_viewer.add_data(class_data)
+        class_layer = prodata_viewer.layer_artist_for_data(class_data)
+        class_layer.state.zorder = 1
+        class_layer.state.color = "#3A86FF"
+        class_layer.state.alpha = 1
+        class_layer.state.size = 4
+
+        prodata_viewer.state.x_att = class_data.id[DISTANCE_COMPONENT]
+        prodata_viewer.state.y_att = class_data.id[VELOCITY_COMPONENT]
+
         prodata_viewer.add_data(student_data)
         student_layer = prodata_viewer.layer_artist_for_data(student_data)
         student_layer.state.color = '#FF7043'
@@ -172,12 +197,7 @@ class StageFive(HubbleStage):
         student_layer.state.size = 8                    
         student_layer.state.alpha = 1
         student_layer.state.visible = self.stage_state.marker_reached('pro_dat0')
-        
-        # prodata_viewer.add_data(class_data)
-
-        prodata_viewer.state.x_att = student_data.id[DISTANCE_COMPONENT]
-        prodata_viewer.state.y_att = student_data.id[VELOCITY_COMPONENT]
-        
+ 
         # load hubble 1929 data
         prodata_viewer.add_data(hubble_data)
         hubble_layer = prodata_viewer.layer_artist_for_data(hubble_data)
@@ -191,6 +211,9 @@ class StageFive(HubbleStage):
         hst_layer.state.visible = self.stage_state.marker_reached('pro_dat5')
         
         prodata_viewer.state.reset_limits()
+
+        layer_toggle = self.get_component("py-layer-toggle")
+        layer_toggle.set_layer_order([student_layer, class_layer, hubble_layer, hst_layer])
     
     def _update_viewer_style(self, dark):
         viewers = ['prodata_viewer']

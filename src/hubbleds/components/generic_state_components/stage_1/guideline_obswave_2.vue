@@ -23,7 +23,7 @@
       </p>
       <p
         v-if=state.zoom_tool_activated>  
-        If you accidentally zoomed in too far or in the wrong spot, you can click <v-btn icon tile dark x-small disabled class="mx-1" elevation="2" style="background-color: #0277BD; border-radius: 5px;"><v-icon style="color:white!important;">mdi-cached</v-icon></v-btn> to reset the view to the full range of wavelengths.
+        If you accidentally zoom in too far or in the wrong spot, you can click <v-btn icon tile dark x-small disabled class="mx-1" elevation="2" style="background-color: #0277BD; border-radius: 5px;"><v-icon style="color:white!important;">mdi-cached</v-icon></v-btn> to reset the view to the full range of wavelengths.
       </p>
       <p>
         <strong>Tip:</strong> You can re-measure the wavelength as many times as you like. 
