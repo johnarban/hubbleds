@@ -424,17 +424,16 @@ class StageTwo(HubbleStage):
             # previous line shows up when you click on the figure
             v1.show_previous_line(show = True, show_label = True)
             v2.show_previous_line(show = True, show_label = True)
-            def _on_dotplot_click(plot, event):
+
+            def _on_dotplot_click(plot, event = None):
                 # it doesn't matter which plot we get the event from
                 # because d = C / \theta and \theta = C / d
-                event['domain']['x'] = round(DISTANCE_CONSTANT / event['domain']['x'], 0)
                 if event is None:
-                    print("No event")
                     return
-                if plot is v1:
-                    v2._on_click(event)
-                else:
-                    v1._on_click(event)
+                the_other_plot = v2 if plot is v1 else v1
+                event['domain']['x'] = self.binned_x(the_other_plot.state.bins, DISTANCE_CONSTANT / event['domain']['x'])
+                the_other_plot._on_click(event)
+
             v1.add_event_callback(lambda event:_on_dotplot_click(v1,event), events=['click'])
             v2.add_event_callback(lambda event:_on_dotplot_click(v2,event), events=['click'])
             
