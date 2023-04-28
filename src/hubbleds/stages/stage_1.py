@@ -656,6 +656,10 @@ class StageOne(HubbleStage):
         if self.stage_state.marker_reached('int_dot1'):
             print_log(f'int_dot1 reached and random state variable set from {self.stage_state.random_state_variable} to False')
             self.stage_state.random_state_variable = False
+            print_log(f'int_dot1 reached and reflection_complete set from {self.stage_state.reflection_complete} to True')
+            self.stage_state.reflection_complete = True
+            print_log(f'int_dot1 reached and gals_max set from {self.stage_state.gals_max} to 20')
+            self.stage_state.gals_max = 20
             if (not self.spectrum_measurement_tutorial.been_opened) and self.stage_state.marker_before('rem_gal1'):
                 self.spectrum_measurement_tutorial._on_dialog_open({'new': True})
          
