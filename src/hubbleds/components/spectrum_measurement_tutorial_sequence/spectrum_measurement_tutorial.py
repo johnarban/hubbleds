@@ -201,6 +201,8 @@ class SpectrumMeasurementTutorialSequence(v.VuetifyTemplate, HubListener):
                     deactivate_cb = partial(self.toggle_tower_select,self.dotplot_viewer_2), 
                     deactivate_before_tool=True)
         
+        extend_tool(self.dotplot_viewer,'bqplot:home', self.spectrum_viewer.state.reset_limits, activate_before_tool = False)
+        
         # run through steps to open run necessary setup calls in the vue file
         for i in range(self.maxStepCompleted):
             self.step = i
@@ -222,6 +224,21 @@ class SpectrumMeasurementTutorialSequence(v.VuetifyTemplate, HubListener):
             link((self.dotplot_viewer.state, 'x_max'), (self.dotplot_viewer_2.state, 'x_max'))
             link((self.dotplot_viewer_2.state, 'x_min'), (self.spectrum_viewer.state, 'x_min'), self.v2w, self.w2v)
             link((self.dotplot_viewer_2.state, 'x_max'), (self.spectrum_viewer.state, 'x_max'), self.v2w, self.w2v)
+            
+            # def f1(x, text = ''):
+            #     print_log(text,color='white')
+            #     return x
+            # def f2(x, text = ''):
+            #     print_log(text,color='white')
+            #     return self.v2w(x)
+            # def f3(x, text = ''):
+            #     print_log(text,color='white')
+            #     return self.w2v(x)
+            # link((self.dotplot_viewer.state, 'x_min'), (self.dotplot_viewer_2.state, 'x_min'), partial(f1, text = 'x_min (d1->d2)'), partial(f1, text = 'x_min (d2->d1)'))
+            # link((self.dotplot_viewer.state, 'x_max'), (self.dotplot_viewer_2.state, 'x_max'), partial(f1, text = 'x_max (d1->d2)'), partial(f1, text = 'x_max (d2->d1)'))
+            # link((self.dotplot_viewer_2.state, 'x_min'), (self.spectrum_viewer.state, 'x_min'), partial(f2, text = 'x_min (d2->s)'), partial(f3, text = 'x_min (s->d2)'))  #self.v2w, self.w2v)
+            # link((self.dotplot_viewer_2.state, 'x_max'), (self.spectrum_viewer.state, 'x_max'), partial(f2, text = 'x_max (d2->s)'), partial(f3, text = 'x_max (s->d2)'))  #self.v2w, self.w2v)
+            
             
             self.example_galaxy_table._glue_data.hub.subscribe(
                 self, NumericalDataChangedMessage,
@@ -265,6 +282,8 @@ class SpectrumMeasurementTutorialSequence(v.VuetifyTemplate, HubListener):
             self.spectrum_viewer.add_event_callback(
                 callback = lambda event:self._activate_gray_markers(self.spectrum_viewer, event), 
                 events=['click'])
+            
+            self.spectrum_viewer.state.reset_limits()
         elif change['new'] & self.been_opened:
             self.vue_on_reopen()
         else:
