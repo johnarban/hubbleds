@@ -257,7 +257,7 @@ class StageFive(HubbleStage):
             
         labels = []
         fake_layers = []
-        ages = np.arange(11, 15.5, 0.5)
+        ages = np.arange(12, 14, 0.25)
         for age in ages:
             labels.append(f"age_{age}")
             data = create_fake_data(labels[-1], fake_age_data(age))
