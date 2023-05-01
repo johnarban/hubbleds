@@ -1,4 +1,6 @@
 import logging
+from readline import set_completion_display_matches_hook
+from networkx import number_weakly_connected_components
 import requests
 
 import astropy.units as u
@@ -6,7 +8,7 @@ from astropy.coordinates import SkyCoord
 from cosmicds.components.table import Table
 from cosmicds.phases import CDSState
 from cosmicds.registries import register_stage
-from cosmicds.utils import load_template, API_URL
+from cosmicds.utils import load_template, API_URL, extend_tool
 from echo import CallbackProperty, add_callback, ignore_callback, callback_property
 from traitlets import default, Bool
 
@@ -23,6 +25,10 @@ from numpy import searchsorted
 from bqplot.marks import Scatter
 
 from glue_jupyter.link import link
+from glue.core import Data, Component
+from numpy import array
+
+from hubbleds import components
 
 log = logging.getLogger()
 
@@ -258,11 +264,8 @@ class StageTwo(HubbleStage):
         first = next((s for s in example_galaxy_data.subsets if s.label=='first measurement'), None)
         second = next((s for s in example_galaxy_data.subsets if s.label=='second measurement'), None)
         
-        
-        
         dotplot_viewer_ang.ignore(lambda layer: layer in [second])
         dotplot_viewer_dist.ignore(lambda layer: layer in [second])
-        
         dotplot_viewer_dist_2.ignore(lambda layer: layer in [first])
         
         self.setup_dotplot_viewers()
@@ -401,6 +404,30 @@ class StageTwo(HubbleStage):
             viewer.state.viewer_height = 150
             viewer.layer_artist_for_data(data).state.color = '#787878'
         
+        data = self.get_data(EXAMPLE_GALAXY_SEED_DATA)
+        comp = {data.id[c].label: array([-999]) for c in [DB_ANGSIZE_FIELD, DB_DISTANCE_FIELD]}
+        first_measurement = Data(label = 'first gal meas', **comp)
+        second_measurement = Data(label = 'second gal meas', **comp)
+        self.data_collection.append(first_measurement)
+        self.data_collection.append(second_measurement)
+        self.add_link(EXAMPLE_GALAXY_SEED_DATA, DB_ANGSIZE_FIELD, first_measurement.label, DB_ANGSIZE_FIELD)
+        self.add_link(EXAMPLE_GALAXY_SEED_DATA, DB_DISTANCE_FIELD, first_measurement.label, DB_DISTANCE_FIELD)
+        
+        data2 = [first_measurement, second_measurement]
+        
+        v1 = self.get_viewer('dotplot_viewer_ang')
+        v3 = self.get_viewer('dotplot_viewer_dist')
+        v4 = self.get_viewer('dotplot_viewer_dist_2')
+        
+        for viewer in [v1, v3]:
+            viewer.add_data(first_measurement)
+            viewer.layer_artist_for_data(first_measurement).state.color = "#FB5607"
+            viewer.layer_artist_for_data(first_measurement).visible = False
+        
+        v4.add_data(second_measurement)
+        v4.layer_artist_for_data(second_measurement).state.color = "#FB5607"
+        v4.layer_artist_for_data(second_measurement).visible = False
+
         def d_a(x):
             return DISTANCE_CONSTANT / x
         
@@ -656,22 +683,40 @@ class StageTwo(HubbleStage):
             
             v3 = self.get_viewer('dotplot_viewer_dist')
             v4 = self.get_viewer('dotplot_viewer_dist_2')
+            
+            def update_measurement(data_label, comp, val):
+                data = self.get_data(data_label)
+                cid = data.id[comp]
+                new_comp = {cid: [val]}
+                data.update_components(new_comp)
 
             if index == 0:
-                self.plot_measurement(v1, self.stage_state.meas_theta, color = colors[index], label = labels[index])
-                self.plot_measurement(v3, distance_from_angular_size(self.stage_state.meas_theta), color = colors[index], label = labels[index])
+                data = self.get_data('first gal meas')
+                v1.layer_artist_for_data(data).visible = True
+                v3.layer_artist_for_data(data).visible = True
+                update_measurement('first gal meas', DB_ANGSIZE_FIELD, self.stage_state.meas_theta)
+                update_measurement('first gal meas', DB_DISTANCE_FIELD, distance_from_angular_size(self.stage_state.meas_theta))
+                # self.plot_measurement(v1, self.stage_state.meas_theta, color = colors[index], label = labels[index])
+                # self.plot_measurement(v3, distance_from_angular_size(self.stage_state.meas_theta), color = colors[index], label = labels[index])
             if index == 1:
-                self.plot_measurement(v4, distance_from_angular_size(self.stage_state.meas_theta), color = colors[index], label = labels[index])
+                data = self.get_data('second gal meas')
+                v4.layer_artist_for_data(data).visible = True
+                update_measurement('second gal meas', DB_ANGSIZE_FIELD, self.stage_state.meas_theta)
+                update_measurement('second gal meas', DB_DISTANCE_FIELD, distance_from_angular_size(self.stage_state.meas_theta))
+                # self.plot_measurement(v4, distance_from_angular_size(self.stage_state.meas_theta), color = colors[index], label = labels[index])
             
             if self.stage_state.marker_after('est_dis4'):
                 self.add_student_distance()
             
             for val in ['x_min','x_max','layers']:
                 if index == 0:
-                    add_callback(v1.state, val , lambda x: self.plot_measurement(v1, self.stage_state.meas_theta, color = colors[index], label = labels[index]))
-                    add_callback(v3.state, val , lambda x: self.plot_measurement(v3, distance_from_angular_size(self.stage_state.meas_theta), color = colors[index], label = labels[index]))
+                    add_callback(v1.state, val, lambda x: update_measurement('first gal meas', val, self.stage_state.meas_theta))
+                    add_callback(v3.state, val, lambda x: update_measurement('first gal meas', val, distance_from_angular_size(self.stage_state.meas_theta)))
+                    # add_callback(v1.state, val , lambda x: self.plot_measurement(v1, self.stage_state.meas_theta, color = colors[index], label = labels[index]))
+                    # add_callback(v3.state, val , lambda x: self.plot_measurement(v3, distance_from_angular_size(self.stage_state.meas_theta), color = colors[index], label = labels[index]))
                 if index == 1:
-                    add_callback(v4.state, val , lambda x: self.plot_measurement(v4, distance_from_angular_size(self.stage_state.meas_theta), color = colors[index], label = labels[index]))
+                    add_callback(v4.state, val, lambda x: update_measurement('second gal meas', val, distance_from_angular_size(self.stage_state.meas_theta)))
+                    # add_callback(v4.state, val , lambda x: self.plot_measurement(v4, distance_from_angular_size(self.stage_state.meas_theta), color = colors[index], label = labels[index]))
             
 
         # if data_label == STUDENT_MEASUREMENTS_LABEL:
