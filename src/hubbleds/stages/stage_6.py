@@ -19,6 +19,12 @@ from ..data.styles import load_style
 from ..data_management import *
 from ..stage import HubbleStage
 
+from glue.core import Data, Component, ComponentID
+import numpy as np
+# import viridis colormap from matplotlib
+from matplotlib.cm import get_cmap
+from matplotlib.colors import to_hex
+
 from ..viewers.viewers import HubbleScatterView
 
 class StageState(CDSState):
@@ -218,9 +224,54 @@ class StageFive(HubbleStage):
         hst_layer.state.visible = self.stage_state.marker_reached('pro_dat5')
         
         prodata_viewer.state.reset_limits()
+        
+        
+       
+        def get_cid(component_label, data = None):
+            if data is None:
+                data = self.get_data(CLASS_DATA_LABEL)
+            return data.id[component_label]
+        
+        def create_fake_data(data_label, component_dict):
+            component_dict = {get_cid(k).label: v for k, v in component_dict.items()}
+            fake_data = Data(label=data_label, **component_dict)
+            
+            return fake_data
+        
+        def register_fake_data(data):
+            self.data_collection.append(data)
+            self.add_link(CLASS_DATA_LABEL, DISTANCE_COMPONENT, data.label, DISTANCE_COMPONENT)
+            self.add_link(CLASS_DATA_LABEL, VELOCITY_COMPONENT, data.label, VELOCITY_COMPONENT)
+            self.add_link(STUDENT_MEASUREMENTS_LABEL, DB_DISTANCE_FIELD, data.label, DISTANCE_COMPONENT)
+            self.add_link(STUDENT_MEASUREMENTS_LABEL, DB_VELOCITY_FIELD, data.label, VELOCITY_COMPONENT)
+        
+        def fake_age_data(age = self.stage_state.hst_age):
+            distance = np.array([10.,200.]) # Mpc
+            velocity = AGE_CONSTANT * distance / age # km/s
+            return {DISTANCE_COMPONENT: distance, VELOCITY_COMPONENT: velocity}
+        
+        def generate_color(number, vmin, vmax):
+            number = (number - vmin) / (vmax - vmin)
+            cmap = get_cmap('plasma')
+            return to_hex(cmap(number))
+            
+        labels = []
+        fake_layers = []
+        ages = np.arange(11, 15.5, 0.5)
+        for age in ages:
+            labels.append(f"age_{age}")
+            data = create_fake_data(labels[-1], fake_age_data(age))
+            register_fake_data(data)
+            prodata_viewer.add_data(data)
+            layer = prodata_viewer.layer_artist_for_data(data)
+            fake_layers.append(layer)
+            layer.state.color = generate_color(age, ages.min(), ages.max())
+            layer.state.visible = False
+            layer.state.size = 4
+            layer.state.zorder = 2
 
         layer_toggle = self.get_component("py-layer-toggle")
-        layer_toggle.set_layer_order([student_layer, class_layer, hubble_layer, hst_layer])
+        layer_toggle.set_layer_order([student_layer, class_layer, hubble_layer, hst_layer] + fake_layers)
     
     def _update_viewer_style(self, dark):
         viewers = ['prodata_viewer']
