@@ -764,7 +764,7 @@
         class="black--text"
         color="accent"
         depressed
-        @click="step--"
+        @click="prevStep()"
       >
         Back
       </v-btn>
@@ -804,7 +804,7 @@
         class="black--text"
         color="accent"
         depressed
-        @click="step++;"
+        @click="nextStep();"
       >
         next
       </v-btn>
@@ -852,11 +852,22 @@ module.exports = {
     console.log(this.$el);
   },
 
+  methods: {
+    nextStep() {
+      this.nextListStep();
+    },
+
+    prevStep() {
+      this.prevListStep();
+    },
+  },
+
   watch: {
     step(newStep, oldStep) {
       const isInteractStep = this.interact_steps.includes(newStep);
       const newCompleted = isInteractStep ? newStep - 1 : newStep;
       this.max_step_completed = Math.max(this.max_step_completed, newCompleted);
+      
     },
   },
 };

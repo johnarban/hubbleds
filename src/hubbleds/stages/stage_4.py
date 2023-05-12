@@ -23,7 +23,7 @@ from ..stage import HubbleStage
 from ..viewers import HubbleScatterView
 from ..viewers.viewers import HubbleFitLayerView
 
-
+demo = True
 class StageState(CDSState):
     trend_response = CallbackProperty(False)
     relvel_response = CallbackProperty(False)
@@ -174,6 +174,8 @@ class StageThree(HubbleStage):
         self.show_team_interface = self.app_state.show_team_interface
         self._setup_complete = False
         
+        if demo:
+            self.prep_demo()
         # This is a hacky fix because these are not initializing correctly on a reload, so we are backing them up 1 or 2 guidelines, and when they go forward again they will be correct.
         if self.stage_state.marker in ['tre_lin2', 'bes_fit1']:
             self.stage_state.marker = 'tre_lin1'
@@ -296,7 +298,20 @@ class StageThree(HubbleStage):
         if not self.trigger_marker_update_cb:
             return
         markers = self.stage_state.markers
+        
+        
+        if demo and (new not in markers):
+            return
+        if demo and (old not in markers):
+            old = markers[markers.index(new) - 1]
         advancing = markers.index(new) > markers.index(old)
+        
+        if demo and advancing and new == "tre_dat1":
+            self.advance_stage('tre_lin2', catch_up=True)
+        
+        if demo and advancing and old == 'you_age1':
+            self.stage_state.marker = "sho_est2"
+            
         if advancing and new == "tre_dat2":
             layer_toggle = self.get_component("py-layer-toggle")
             layer_toggle.remove_ignore_condition(self.ignore_class_layer)
@@ -489,3 +504,59 @@ class StageThree(HubbleStage):
         # print('vue_stage_four_complete')
         self.story_state.stage_index = 5
         self.stage_state.stage_4_complete = False
+
+    
+    def prep_demo(self):
+        self.stage_state.trend_line_drawn = True
+        self.stage_state.best_fit_clicked = True
+        
+            
+
+    def advance_stage(self, markers, *args, catch_up = False):
+    
+        state = self.stage_state
+        
+        stage_markers = state.markers
+        
+        
+        # start at beginning
+        if markers is None:
+            state.marker = stage_markers[0]
+        
+        # go straight to the end (usually bad)
+        
+        # run through the rest of the markers
+        if markers == 'all':
+            index = stage_markers.index(state.marker)
+            for marker in stage_markers[index:]:
+                print(marker)
+                state.marker = marker
+            return
+        
+        if markers == 'last':
+            markers = stage_markers[-1]
+        
+        if catch_up:
+            start = stage_markers.index(state.marker)
+            end = stage_markers.index(markers)
+            for m in stage_markers[start:end+1]:
+                state.marker = m
+                
+        
+        # run over list of markers
+        if not isinstance(markers, list):
+            markers = [markers]
+
+        for arg in args:
+            markers.append(arg)
+        
+
+        for marker in markers:
+            state.marker = marker
+
+        
+    def vue_advance_stage(self, _data):
+        self.advance_marker(_data['marker'], _data.get('catch_up', False))
+    
+    def vue_catchup_stage(self, *args):
+        self.advance_stage(*args, catch_up=True)

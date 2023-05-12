@@ -15,6 +15,7 @@ from echo import add_callback, ignore_callback, CallbackProperty, \
     callback_property
 from glue.core import Data
 from glue.core.message import NumericalDataChangedMessage, SubsetUpdateMessage
+from hubbleds.components.spectrum_measurement_tutorial_sequence import spectrum_measurement_tutorial
 from numpy import isin
 from traitlets import Bool, default, validate
 
@@ -32,7 +33,7 @@ from glue_jupyter.link import link
 
 log = logging.getLogger()
 
-
+demo = True
 import inspect
 from IPython.display import Javascript, display
 
@@ -297,6 +298,9 @@ class StageOne(HubbleStage):
         # This flag indicates whether we're using one of the convenience "fill" methods
         # In which case we don't need to do all of the UI manipulation in quite the same way
         self._filling_data = False
+        
+        if demo:
+            self.stage_state.marker = 'sel_gal1'
 
         # Set up any Data-based state values
         self._update_state_from_measurements()
@@ -572,6 +576,8 @@ class StageOne(HubbleStage):
         # Uncomment this to pre-fill galaxy data for convenience when testing later stages
         # self.vue_fill_data()
         # self.vue_select_galaxies()
+        if demo:
+            self.prep_demo()
     
     #@print_function_name
     def _on_measurements_changed(self, msg):
@@ -612,6 +618,11 @@ class StageOne(HubbleStage):
             self.selection_tool.show_galaxies()
             self.selection_tool.widget.center_on_coordinates(
                 self.START_COORDINATES, fov=60 * u.deg, instant=True)
+        
+        if demo and advancing and old == "sel_gal2":
+            self.galaxy_table.selected = []
+            self.example_galaxy_table.selected = []
+            self.vue_marker_to_cho_row1()
             
         if advancing and old == "sel_gal3":
             self.galaxy_table.selected = []
@@ -627,7 +638,27 @@ class StageOne(HubbleStage):
             
         if advancing and new == "cho_row1" and self.example_galaxy_table.index is not None:
             self.stage_state.spec_viewer_reached = True
-            self.stage_state.marker = "mee_spe1"
+            self.stage_state.marker = "obs_wav1"
+        
+            
+        if demo and advancing and old == "obs_wav1":
+            self.stage_state.marker = "dop_cal2"
+        
+        if demo and advancing and new == 'che_mea1':
+            self.stage_state.marker = "dop_cal6"
+            self.enable_velocity_tool(True)
+        
+        if demo and advancing and old == 'rem_gal1':
+            self.stage_state.marker = "dop_cal6"
+        
+        if demo and advancing and old == 'dop_cal6':
+            self.stage_state.marker = 'end_sta1'
+        
+        if demo and self.stage_state.marker_reached("rem_gal1"):
+            if self.spectrum_measurement_tutorial.been_opened:
+                self.spectrum_measurement_tutorial.vue_on_close()
+            
+            
             
         if advancing and old == "dop_cal2" and (self.example_galaxy_table.index is not None) :
             self.stage_state.doppler_calc_reached = True
@@ -656,6 +687,8 @@ class StageOne(HubbleStage):
             spectrum_viewer = self.get_viewer("spectrum_viewer")
             spectrum_viewer.toolbar.set_tool_enabled("hubble:wavezoom", True)
             spectrum_viewer.toolbar.set_tool_enabled("bqplot:home", True)
+        
+        
         
         if advancing and new == "che_mea1":
             spectrum_viewer = self.get_viewer("spectrum_viewer")
@@ -1055,6 +1088,7 @@ class StageOne(HubbleStage):
 
             if tool is not None:
                 table.update_tool(tool)
+        self.vue_fill_data()
         
     #@print_function_name
     def vue_update_velocities(self, _args):
@@ -1105,3 +1139,45 @@ class StageOne(HubbleStage):
 
     def vue_fill_table(self, _args):
         self.fill_table(self.example_galaxy_table)
+    
+        
+    def prep_demo(self):
+        spectrum_viewer = self.get_viewer("spectrum_viewer")
+        spectrum_viewer.toolbar.set_tool_enabled("hubble:restwave", True)
+        spectrum_viewer.toolbar.set_tool_enabled("hubble:wavezoom", True)
+        if not self.stage_state.zoom_tool_activated:
+            self.stage_state.zoom_tool_activated = True
+        spectrum_viewer.toolbar.set_tool_enabled("bqplot:home", True)
+        try:
+            spectrum_viewer.add_event_callback(spectrum_viewer._on_mouse_moved,
+                                                events=['mousemove'])
+        except:
+            pass
+        try:
+            spectrum_viewer.add_event_callback(spectrum_viewer._on_click,
+                                                events=['click'])
+        except:
+            pass
+        try:
+            spectrum_viewer.add_event_callback(self.on_spectrum_click,
+                                                events=['click'])
+        except:
+            pass
+        try:
+            spectrum_viewer.add_event_callback(self.on_spectrum_click_example_galaxy,
+                                                events=['click'])
+        except:
+            pass
+        
+    def vue_marker_to_cho_row1(self, *args):
+        self.stage_state.marker = 'cho_row1'
+        self.stage_state.spec_viewer_reached = True
+    
+
+    
+    
+    
+    
+    
+    
+    

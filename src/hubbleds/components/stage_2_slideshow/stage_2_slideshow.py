@@ -21,6 +21,7 @@ class Stage2SlideShow(v.VuetifyTemplate):
     # intro_complete = Bool(False).tag(sync=True)
     distance_const = Float().tag(sync=True)
     image_location = Unicode().tag(sync=True)
+    steps = List([0,3,4,6, 8, 12]).tag(sync=True)
 
     _titles = [
         "1920's Astronomy",
@@ -44,6 +45,8 @@ class Stage2SlideShow(v.VuetifyTemplate):
         self.image_location = image_location
         self.distance_const = DISTANCE_CONSTANT
         self.currentTitle = self._default_title
+        self._titles = [self._titles[i] for i in self.steps]
+        
 
         def update_title(change):
             index = change["new"]
@@ -55,3 +58,22 @@ class Stage2SlideShow(v.VuetifyTemplate):
         self.observe(update_title, names=["step"])
 
         super().__init__(*args, **kwargs)
+        
+    def vue_nextListStep(self,*args, **kwargs):
+        if self.step in self.steps:
+            # progress following the steps list
+            index = self.steps.index(self.step)
+            self.step = self.steps[index + 1]
+        else:
+            # progress normally
+            self.step += 1
+            
+    def vue_prevListStep(self, *args, **kwargs):
+
+        if self.step in self.steps:
+            # progress following the steps list
+            index = self.steps.index(self.step)
+            self.step = self.steps[index - 1]
+        else:
+            # progress normally
+            self.step -= 1

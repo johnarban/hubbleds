@@ -28,6 +28,8 @@ from functools import partial
 
 log = logging.getLogger()
 
+demo = True
+
 import inspect
 def print_log(*args, **kwargs):
     if False:
@@ -244,6 +246,8 @@ class StageTwo(HubbleStage):
         # What we really want is for enable_distance_tool to be true if initialized at fil_rem1, but that isn't working, so this is our hacky fix for now. (And really, they shouldn't have to re-click the measuring tape if their distances are already there. It should just be 'next')
         if self.stage_state.marker in ['fil_rem1']: 
             self.stage_state.marker_backward = 1
+            
+        self.prep_demo()
         
         dosdonts_slideshow = DosDontsSlideShow(self.stage_state.image_location_dosdonts)
         self.add_component(dosdonts_slideshow, label='py-dosdonts-slideshow')
@@ -465,6 +469,12 @@ class StageTwo(HubbleStage):
         if not self.trigger_marker_update_cb:
             return
         markers = self.stage_state.markers
+        
+        if demo and (new not in markers):
+            return
+        if demo and (old not in markers):
+            old = markers[markers.index(new) - 1]
+        
         if new not in markers:
             print_log(f"Marker {new} not found, defaulting to {markers[0]}")
             new = markers[0]
@@ -482,6 +492,16 @@ class StageTwo(HubbleStage):
             self.distance_tool.reset_canvas()
             # need to turn off ruler marker also.False
             # and start stage 2 at the start coordinates
+        
+        if demo and advancing and (old == 'est_dis4'):
+            self.advance_stage('ang_siz5a', catch_up=True)
+            return
+        
+        if demo and advancing and (old == 'ang_siz5a'):
+            self.advance_stage('dot_seq5')
+        
+        if demo and self.stage_state.marker_reached('ang_siz3'):
+            self.stage_state.show_ruler = True
         
         if advancing and (new == 'ang_siz5'):
             self.distance_tool.reset_canvas()
@@ -906,3 +926,55 @@ class StageTwo(HubbleStage):
         # print('vue_stage_three_complete')
         self.story_state.stage_index = 4
         self.stage_state.stage_3_complete = False
+
+    def prep_demo(self):
+        self.stage_state.dos_donts_opened = True
+        
+
+        
+        return
+                
+    
+    def advance_stage(self, markers, *args, catch_up = False):
+    
+        state = self.stage_state
+        
+        stage_markers = state.markers
+        
+        
+        # start at beginning
+        if markers is None:
+            state.marker = stage_markers[0]
+        
+        # go straight to the end (usually bad)
+        
+        # run through the rest of the markers
+        if markers == 'all':
+            index = stage_markers.index(state.marker)
+            for marker in stage_markers[index:]:
+                print(marker)
+                state.marker = marker
+            return
+        
+        if markers == 'last':
+            markers = stage_markers[-1]
+        
+        if catch_up:
+            start = stage_markers.index(state.marker)
+            end = stage_markers.index(markers)
+            for m in stage_markers[start:end+1]:
+                state.marker = m
+                
+        
+        # run over list of markers
+        if not isinstance(markers, list):
+            markers = [markers]
+
+        for arg in args:
+            markers.append(arg)
+        
+
+        for marker in markers:
+            state.marker = marker
+
+        

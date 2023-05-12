@@ -1,5 +1,32 @@
 <template>
   <v-container>
+     <v-chip-group
+      active-class="primary"
+      column
+    >
+      <v-text-field
+          class="demo_v-text-field"
+          v-model="stage_state.marker"
+          rounded
+          outlined
+          dense
+          label="Marker"
+          @change="() => {
+            console.log('stage state:', stage_state);
+            console.log('story state:', story_state);
+          }"
+        />
+      <v-chip
+        v-for="(marker, index) in ['est_dis4','ang_siz5a', 'dot_seq5','rep_rem1','fil_rem1']"
+        dark
+        :color="stage_state.marker == marker ? 'deep-purple darken-4' : 'blue-grey darken-3'"
+        text-color="blue-grey lighten-5"
+        :key="index"
+        @click="stage_state.marker = marker"
+      >
+        {{ marker }}
+      </v-chip>
+    </v-chip-group>
     <v-row v-if="show_team_interface">
       <v-col>
         <v-btn
@@ -270,6 +297,15 @@
 
 
 <style>
+
+.demo_v-text-field {
+  flex: none;
+  margin: auto 10px;
+}
+.demo_v-text-field div.v-input__slot {
+  width: 15ch;
+  font-size: 10pt;
+}
 
 .v-dialog .v-card__text {
   font-size: 18px !important;

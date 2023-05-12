@@ -21,7 +21,7 @@ from ..viewers import HubbleScatterView
 from ..viewers.viewers import \
     HubbleClassHistogramView, HubbleHistogramView
 
-
+demo = True
 class StageState(CDSState):
     relage_response = CallbackProperty(False)
     two_hist_response = CallbackProperty(False)
@@ -226,6 +226,9 @@ class StageFour(HubbleStage):
 
         add_callback(self.story_state, 'responses', self.age_calc_update_guesses)
 
+        if demo and self.stage_state.marker == 'ran_var1':
+            self.stage_state.marker = 'cla_res1'
+            self.prep_demo()
         
         self.show_team_interface = self.app_state.show_team_interface
 
@@ -489,6 +492,8 @@ class StageFour(HubbleStage):
             self.get_viewer("all_distr_viewer_student").state.reset_limits()
             self.match_student_class_hist_axes(True)
             
+        if demo and old == 'two_his1':
+            self.stage_state.marker = 'acc_unc1'
         
         if not advancing and self.stage_state.marker_before('two_his1'):
             self.match_student_class_hist_axes(False)
@@ -796,3 +801,7 @@ class StageFour(HubbleStage):
                 class_layer = layer_viewer.layer_artist_for_data(self.get_data(CLASS_DATA_LABEL))
                 student_layer.state.visible = True
                 class_layer.state.visible = False
+
+    def prep_demo(self):
+        self.stage_state.class_trend_line_drawn = True
+        self.stage_state.class_best_fit_clicked = True

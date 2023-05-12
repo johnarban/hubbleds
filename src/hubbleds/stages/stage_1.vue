@@ -1,5 +1,33 @@
 <template>
   <v-container>
+    <v-chip-group
+      active-class="primary"
+      column
+    >
+      <v-text-field
+          class="demo_v-text-field"
+          v-model="stage_state.marker"
+          rounded
+          outlined
+          dense
+          label="Marker"
+          @change="() => {
+            console.log('stage state:', stage_state);
+            console.log('story state:', story_state);
+          }"
+        />
+        
+      <v-chip
+        v-for="(marker, index) in ['sel_gal1','cho_row','obs_wav1', 'dop_cal2', 'che_mea1','rem_gal1','dop_cal6']"
+        dark
+        :color="stage_state.marker == marker ? 'deep-purple darken-4' : 'blue-grey darken-3'"
+        text-color="blue-grey lighten-5"
+        :key="index"
+        @click="stage_state.marker = marker"
+      >
+        {{ marker }}
+      </v-chip>
+    </v-chip-group>
     <v-row v-if="show_team_interface">
       <v-col>
         <v-btn
@@ -7,16 +35,7 @@
           class="black--text"
           @click="fill_data();"
         >fill data points</v-btn>
-        <v-btn
-          color="error"
-          class="black--text"
-          @click="() => {
-            console.log('stage state:', stage_state);
-            console.log('story state:', story_state);
-          }"
-        >
-          console.log State
-        </v-btn>
+
         <v-btn
           color="error"
           class="black--text"
@@ -177,7 +196,7 @@
           :color="stage_state.table_highlights.includes(stage_state.marker) ? 'info' : 'black'"
           :class="stage_state.table_highlights.includes(stage_state.marker) ? 'pa-1 my-n1' : 'pa-0'"
           outlined
-          v-if="stage_state.show_galaxy_table || ((stage_state.indices[stage_state.marker] < stage_state.indices['cho_row1'])  || (stage_state.indices[stage_state.marker] >= stage_state.indices['rem_gal1']) )"
+          v-if="true || ((stage_state.indices[stage_state.marker] < stage_state.indices['cho_row1'])  || (stage_state.indices[stage_state.marker] >= stage_state.indices['rem_gal1']) )"
         > 
           <jupyter-widget  :widget="widgets.galaxy_table"/>
         </v-card>
@@ -185,7 +204,7 @@
           :color="stage_state.table_highlights.includes(stage_state.marker) ? 'info' : 'black'"
           :class="stage_state.table_highlights.includes(stage_state.marker) ? 'pa-1 my-n1' : 'pa-0'"
           outlined
-          v-if="stage_state.show_example_galaxy_table || ((stage_state.indices[stage_state.marker] >= stage_state.indices['cho_row1'])  && (stage_state.indices[stage_state.marker] < stage_state.indices['rem_gal1']) )" 
+          v-if="false && ((stage_state.indices[stage_state.marker] >= stage_state.indices['cho_row1'])  && (stage_state.indices[stage_state.marker] < stage_state.indices['rem_gal1']) )" 
         > 
           <jupyter-widget :widget="widgets.example_galaxy_table"/>
         </v-card>
@@ -464,7 +483,14 @@
 
 
 <style>
-
+.demo_v-text-field {
+  flex: none;
+  margin: auto 10px;
+}
+.demo_v-text-field div.v-input__slot {
+  width: 15ch;
+  font-size: 10pt;
+}
 .v-dialog .v-card__text {
   font-size: 18px !important;
 }

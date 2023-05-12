@@ -837,8 +837,8 @@
         get started
       </v-btn>
       <v-btn
-        v-if="step >= 6"
-        :disabled="step > 6"
+        v-if="step >= 2"
+        :disabled="step < 2"
         color="accent"
         class="black--text"
         depressed

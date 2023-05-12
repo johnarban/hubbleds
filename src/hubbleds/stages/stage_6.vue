@@ -1,5 +1,38 @@
 <template>
   <v-container>
+     <v-row>
+      <!-- for these markers ['age_dis1', 'con_int1', 'cla_res1c','two_his1'] create chips in a v-chip group
+        where clicking on the chip will set the marker to that value -->
+        <v-chip-group
+          active-class="primary"
+          column
+        >
+        
+           <v-text-field
+          class="demo_v-text-field"
+          v-model="stage_state.marker"
+          rounded
+          outlined
+          dense
+          label="Marker"
+          @change="() => {
+            console.log('stage state:', stage_state);
+            console.log('story state:', story_state);
+          }"
+        />
+          <v-chip
+            v-for="(marker, index) in stage_state.markers"
+            dark
+            :color="stage_state.marker == marker ? 'deep-purple darken-4' : 'blue-grey darken-3'"
+            text-color="blue-grey lighten-5"
+            :key="index"
+            @click="stage_state.marker = marker"
+          >
+            {{ marker }}
+          </v-chip>
+        </v-chip-group>
+      
+    </v-row>
     <v-row v-if="show_team_interface">
       <v-col>
         <v-btn
