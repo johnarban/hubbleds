@@ -394,7 +394,16 @@ class HubblesLaw(Story):
         all_students_summ_data = self.data_collection[ALL_STUDENT_SUMMARIES_LABEL]
         student_id = self.student_user["id"]
         index = next((i for i in range(all_students_summ_data.size) if all_students_summ_data[STUDENT_ID_COMPONENT][i] == student_id), None)
-        if index is not None:
+        if index is None:
+            self.add_data_values(
+                data=all_students_summ_data,
+                values={
+                    H0_COMPONENT: h0,
+                    AGE_COMPONENT: age,
+                    STUDENT_ID_COMPONENT: student_id
+                }
+            )
+        else:
             h0s = all_students_summ_data[H0_COMPONENT]
             ages = all_students_summ_data[AGE_COMPONENT]
             h0s[index] = h0
@@ -585,15 +594,23 @@ class HubblesLaw(Story):
             all_summ_data = self.data_collection[ALL_CLASS_SUMMARIES_LABEL]
             index = next((i for i in range(all_summ_data.size) if all_summ_data[CLASS_ID_COMPONENT][i] == class_id), None)
             if index is None:
-                return
-            h0s = all_summ_data[H0_COMPONENT]
-            ages = all_summ_data[AGE_COMPONENT]
-            h0s[index]= h0
-            ages[index]= age
-            all_summ_data.update_components({
-                all_summ_data.id[H0_COMPONENT]: h0s,
-                all_summ_data.id[AGE_COMPONENT]: ages
-            })
+                self.add_data_values(
+                    data=all_summ_data,
+                    values={
+                        H0_COMPONENT: h0,
+                        AGE_COMPONENT: age,
+                        CLASS_ID_COMPONENT: class_id
+                    }
+                )
+            else:
+                h0s = all_summ_data[H0_COMPONENT]
+                ages = all_summ_data[AGE_COMPONENT]
+                h0s[index]= h0
+                ages[index]= age
+                all_summ_data.update_components({
+                    all_summ_data.id[H0_COMPONENT]: h0s,
+                    all_summ_data.id[AGE_COMPONENT]: ages
+                })
 
 
     def setup_for_student(self, app_state):
