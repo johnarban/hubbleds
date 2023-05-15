@@ -11,21 +11,17 @@
           outlined
           dense
           label="Marker"
-          @change="() => {
-            console.log('stage state:', stage_state);
-            console.log('story state:', story_state);
-          }"
         />
         
       <v-chip
-        v-for="(marker, index) in ['sel_gal1','cho_row','obs_wav1', 'dop_cal2', 'che_mea1','rem_gal1','dop_cal6']"
+        v-for="(marker, index) in stage_state.demo_markers"
         dark
-        :color="stage_state.marker == marker ? 'deep-purple darken-4' : 'blue-grey darken-3'"
+        :color="stage_state.marker == marker['marker'] ? 'deep-purple darken-4' : 'blue-grey darken-3'"
         text-color="blue-grey lighten-5"
         :key="index"
-        @click="stage_state.marker = marker"
+        @click="run_demo(marker)"
       >
-        {{ marker }}
+        {{ marker['label'] }}
       </v-chip>
     </v-chip-group>
     <v-row v-if="show_team_interface">

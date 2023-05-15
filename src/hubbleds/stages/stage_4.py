@@ -75,6 +75,9 @@ class StageState(CDSState):
         'sho_est1',
         'sho_est2', # last marker now
     ])
+    
+    demo_markers = ListCallbackProperty(
+        ['exp_dat1','tre_lin2', 'bes_fit1', 'age_uni3','you_age1','sho_est2'])
 
     step_markers = ListCallbackProperty([])
 
@@ -108,6 +111,7 @@ class StageState(CDSState):
         'markers', 'indices', # 'step_markers',
         'table_highlights', 'image_location',
         'my_galaxies_plot_highlights', 'all_galaxies_plot_highlights',
+        'demo_markers',
     ]
 
     def __init__(self, *args, **kwargs):

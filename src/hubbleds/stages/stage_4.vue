@@ -15,13 +15,9 @@
           outlined
           dense
           label="Marker"
-          @change="() => {
-            console.log('stage state:', stage_state);
-            console.log('story state:', story_state);
-          }"
         />
       <v-chip
-        v-for="(marker, index) in ['exp_dat1','tre_lin2', 'bes_fit1', 'age_uni3','you_age1','sho_est2']"
+        v-for="(marker, index) in stage_state.demo_markers"
         dark
         :color="stage_state.marker == marker ? 'deep-purple darken-4' : 'blue-grey darken-3'"
         text-color="blue-grey lighten-5"

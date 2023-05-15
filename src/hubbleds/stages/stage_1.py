@@ -177,7 +177,17 @@ class StageState(CDSState):
         'ref_vel1',
         'end_sta1'
     ])
-
+    
+    
+    demo_markers = ListCallbackProperty([
+        {'marker':'sel_gal1', 'label': 'Select Galaxy'},
+        {'marker': 'cho_row1', 'label': 'Choose Row'},
+        {'marker': 'obs_wav2', 'label': 'Observed Wavelength'},
+        {'marker': 'dop_cal2', 'label': 'Doppler Calculation'},
+        {'marker': 'che_mea1', 'label': 'Check Measurement'},
+        {'marker': 'rem_gal1', 'label': 'Remaining Galaxies'},
+        {'marker': 'dop_cal6', 'label': 'Finish Stage'},
+        ])
     step_markers = ListCallbackProperty([])
 
     # step_markers = ListCallbackProperty([
@@ -220,7 +230,8 @@ class StageState(CDSState):
         'csv_highlights',
         'table_highlights', 'spec_highlights',
         # 'gals_total', 'obswaves_total',
-        'velocities_total', 'image_location'
+        'velocities_total', 'image_location',
+        'demo_markers'
     ]
 
     def __init__(self, *args, **kwargs):
@@ -1140,7 +1151,12 @@ class StageOne(HubbleStage):
     def vue_fill_table(self, _args):
         self.fill_table(self.example_galaxy_table)
     
-        
+    
+    def run_demo(self, marker):
+        self.stage_state.marker = marker
+    
+    def vue_run_demo(self, msg):
+        self.run_demo(msg['marker'])
     def prep_demo(self):
         spectrum_viewer = self.get_viewer("spectrum_viewer")
         spectrum_viewer.toolbar.set_tool_enabled("hubble:restwave", True)

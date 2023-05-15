@@ -113,7 +113,9 @@ class StageState(CDSState):
         'rep_rem1',
         'fil_rem1',
     ])
-
+    
+    demo_markers = ListCallbackProperty(['est_dis4','ang_siz5a', 'dot_seq5','rep_rem1','fil_rem1'])
+    
     step_markers = ListCallbackProperty([])
 
     # step_markers = CallbackProperty([
@@ -165,7 +167,8 @@ class StageState(CDSState):
     _NONSERIALIZED_PROPERTIES = [
         'markers', 'indices', #'step_markers',
         'csv_highlights', 'table_highlights',
-        'distances_total', 'image_location'
+        'distances_total', 'image_location',
+        'demo_markers'
     ]
 
     def __init__(self, *args, **kwargs):

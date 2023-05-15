@@ -21,7 +21,7 @@
           }"
         />
           <v-chip
-            v-for="(marker, index) in ['cla_res1','age_dis1', 'con_int1', 'cla_res1c','two_his1', 'acc_unc1']"
+            v-for="(marker, index) in stage_state.demo_markers"
             dark
             :color="stage_state.marker == marker ? 'deep-purple darken-4' : 'blue-grey darken-3'"
             text-color="blue-grey lighten-5"
