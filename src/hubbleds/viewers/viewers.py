@@ -12,7 +12,7 @@ from cosmicds.mixins import LineHoverStateMixin, LineHoverViewerMixin
 __all__ = [
     "HubbleScatterViewerState", "HubbleFitViewerState",
     "HubbleFitView", "HubbleScatterView", "HubbleClassHistogramView",
-    "HubbleDotPlotView"
+    "HubbleDotPlotView", 'HubbleTestHist'
 ]
 
 
@@ -144,6 +144,19 @@ HubbleClassHistogramView = cds_viewer(
         "bqplot:home",
         "bqplot:xzoom",
         "bqplot:xrange"
+    ],
+    label="Class Histogram"
+)
+
+HubbleTestHist = cds_viewer(
+    HubbleHistogramViewer,
+    state_cls=HubbleHistogramViewerState,
+    name="HubbleHistogramView",
+    viewer_tools=[
+        "bqplot:home",
+        "bqplot:xzoom",
+        "hubble:singlebinselectonly",
+        "hubble:binselectonly"
     ],
     label="Class Histogram"
 )
