@@ -135,9 +135,14 @@ class SingleBinSelect(InteractCheckableTool):
             next=None,
             events=['click']
         )
-        self.x =  [0,0]
         self.interact.on_msg(self._message_handler)
-    
+        
+        def reset_selected_value(old, new):
+            if new is None:
+                self._selected_value = old
+                
+        add_callback(self, '_selected_value', reset_selected_value, echo_old=True)
+        
     def _message_handler(self, interaction, content, buffers):
         if content['event'] == 'click':
             x = content['domain']['x']
