@@ -155,10 +155,10 @@ HubbleTestHist = cds_viewer(
     viewer_tools=[
         "bqplot:home",
         "bqplot:xzoom",
-        "hubble:singlebinselectonly",
-        "hubble:binselectonly"
+        "hubble:singlebinselect",
+        "hubble:binselect",
     ],
-    label="Class Histogram"
+    label="Test Histogram"
 )
 
 
