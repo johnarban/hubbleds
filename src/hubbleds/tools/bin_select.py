@@ -8,7 +8,6 @@ from glue_jupyter.bqplot.common.tools import InteractCheckableTool, CheckableToo
 from glue.config import viewer_tool
 from glue_jupyter.bqplot.common.tools import INTERACT_COLOR
 
-from contextlib import nullcontext
 
 
 from bqplot.interacts import BrushIntervalSelector, IndexSelector
@@ -54,22 +53,21 @@ class BinSelect(BqplotSelectionTool):
             self.viewer.apply_roi(self.roi)
 
     def update_selection(self, *args):
-        with self.viewer._output_widget or nullcontext():
-            bins = self.viewer.state.bins
-            bin_centers = (bins[:-1] + bins[1:]) / 2
-            if self.interact.selected is not None:
-                x = self.interact.selected
-                x_min = min(x)
-                x_max = max(x)
-                self._selected_range = (x_min, x_max)
-                if x_min != x_max:
-                    left = np.searchsorted(bin_centers, x_min, side='left')
-                    right = np.searchsorted(bin_centers, x_max, side='right')
-                    x_min, x_max = bins[left], bins[right]
-                self._x_min = x_min
-                self._x_max = x_max
-                self.apply_roi(x_min, x_max)
-                self.viewer.toolbar.active_tool = None
+        bins = self.viewer.state.bins
+        bin_centers = (bins[:-1] + bins[1:]) / 2
+        if self.interact.selected is not None:
+            x = self.interact.selected
+            x_min = min(x)
+            x_max = max(x)
+            self._selected_range = (x_min, x_max)
+            if x_min != x_max:
+                left = np.searchsorted(bin_centers, x_min, side='left')
+                right = np.searchsorted(bin_centers, x_max, side='right')
+                x_min, x_max = bins[left], bins[right]
+            self._x_min = x_min
+            self._x_max = x_max
+            self.apply_roi(x_min, x_max)
+            self.viewer.toolbar.active_tool = None
 
             self.interact.selected = None
         
@@ -94,8 +92,7 @@ class BinSelect(BqplotSelectionTool):
         return selection
     
     def activate(self):
-        with self.viewer._output_widget or nullcontext():
-            self.interact.selected = None
+        self.interact.selected = None
         super().activate()
         # self.tool_activated = True
     
