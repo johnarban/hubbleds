@@ -69,8 +69,11 @@ class BinSelect(BqplotSelectionTool):
                 self._x_min = x_min
                 self._x_max = x_max
                 self.apply_roi(x_min, x_max)
+                self.viewer.toolbar.active_tool = None
 
             self.interact.selected = None
+        
+        
     
     @property
     def subset_state(self):
