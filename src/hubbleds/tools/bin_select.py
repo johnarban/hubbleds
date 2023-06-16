@@ -71,7 +71,6 @@ class BinSelect(BqplotSelectionTool):
                 self.apply_roi(x_min, x_max)
 
             self.interact.selected = None
-        print(self.selection)
     
     @property
     def subset_state(self):
@@ -172,9 +171,7 @@ class SingleBinSelect(InteractCheckableTool):
             self._bin_center = (right_edge + left_edge) / 2
             self.apply_roi(left_edge, right_edge)
         
-        print(self.selection)
         self.viewer.toolbar.active_tool = None
-        print(self.selection)
     
     @property
     def subset_state(self):
