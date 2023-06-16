@@ -132,6 +132,8 @@ HubbleHistogramView = cds_viewer(
     viewer_tools=[
         "bqplot:home",
         "bqplot:xzoom",
+        "hubble:singlebinselect",
+        "hubble:binselect",
     ],
     label="Class Histogram"
 )
@@ -143,7 +145,9 @@ HubbleClassHistogramView = cds_viewer(
     viewer_tools=[
         "bqplot:home",
         "bqplot:xzoom",
-        "bqplot:xrange"
+        "bqplot:xrange",
+        "hubble:singlebinselect",
+        "hubble:binselect",
     ],
     label="Class Histogram"
 )

@@ -64,6 +64,21 @@ class StageState(CDSState):
 
     cla_low_age = CallbackProperty(0)
     cla_high_age = CallbackProperty(0)
+    
+    
+    # class and all class estimates
+    class_age = CallbackProperty(0)
+    class_age_high = CallbackProperty(0)
+    class_age_low = CallbackProperty(0)
+    
+    all_student_age = CallbackProperty(0)
+    all_student_age_high = CallbackProperty(0)
+    all_student_age_low = CallbackProperty(0)
+    
+    all_class_age = CallbackProperty(0)
+    all_class_age_high = CallbackProperty(0)
+    all_class_age_low = CallbackProperty(0)
+    
 
     age_calc_state = DictCallbackProperty({
         'hint1_dialog': False,
@@ -397,7 +412,9 @@ class StageFour(HubbleStage):
 
         extend_tool(class_distr_viewer, 'bqplot:xrange',
                     hist_selection_activate, hist_selection_deactivate)
-
+        
+        self.extend_histogram_selection_tools()
+    
         # We want the hub_fit_viewer to be selecting for the same subset as the table
         def fit_selection_activate():
             table = self.get_widget('fit_table')
@@ -661,6 +678,47 @@ class StageFour(HubbleStage):
         self._setup_scatter_layers()
         self._setup_histogram_layers()
         self._setup_complete = True
+    
+    def extend_histogram_selection_tools(self):
+        # Extend the hubble:singlebinselect and hubble:binselect tools
+        class_distr_viewer = self.get_viewer("class_distr_viewer")
+        all_distr_viewer_class = self.get_viewer("all_distr_viewer_class")
+        all_distr_viewer_student = self.get_viewer("all_distr_viewer_student")
+        
+        def single_select_action(viewer):
+            print("single select action", viewer)
+            tool = viewer.toolbar.tools['hubble:singlebinselect']
+            selection = tool.selection
+            if selection is not None:
+                if viewer == class_distr_viewer:
+                    self.stage_state.class_age = selection['bin_center']
+                elif viewer == all_distr_viewer_class:
+                    self.stage_state.all_class_age = selection['bin_center']
+                elif viewer == all_distr_viewer_student:
+                    self.stage_state.all_student_age = selection['bin_center']
+        
+        def range_select_action(viewer):
+            print("range select action", viewer)
+            tool = viewer.toolbar.tools['hubble:binselect']
+            selection = tool.selection
+            if selection is not None:
+                if viewer == class_distr_viewer:
+                    self.stage_state.class_age_low = selection['bin_min']
+                    self.stage_state.class_age_high = selection['bin_max']
+                elif viewer == all_distr_viewer_class:
+                    self.stage_state.all_class_age_low = selection['bin_min']
+                    self.stage_state.all_class_age_high = selection['bin_max']
+                elif viewer == all_distr_viewer_student:
+                    self.stage_state.all_student_age_low = selection['bin_min']
+                    self.stage_state.all_student_age_high = selection['bin_max']
+        
+        viewers = [class_distr_viewer, all_distr_viewer_class, all_distr_viewer_student]
+        for i, viewer in enumerate(viewers):
+            print('extending')
+            extend_tool(viewers[i], 'hubble:singlebinselect', 
+                        deactivate_cb = partial(single_select_action, viewers[i]))
+            extend_tool(viewers[i], 'hubble:binselect', 
+                    deactivate_cb = partial(range_select_action, viewers[i]))
 
     @property
     def all_viewers(self):
