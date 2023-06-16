@@ -34,7 +34,7 @@ class BinSelect(BqplotSelectionTool):
     _x_max = CallbackProperty(0)
     _selected_range = CallbackProperty((0,0))
     
-    _apply_roi = True
+    _apply_roi = False
     
 
     def __init__(self, viewer, **kwargs):
@@ -113,7 +113,7 @@ class SingleBinSelect(InteractCheckableTool):
     
     allow_nonzero_bins = True
     
-    _apply_roi = True
+    _apply_roi = False
     _roi_orientation = 'x'
     
     _selected_value = CallbackProperty(0.0)
