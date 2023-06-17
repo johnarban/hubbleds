@@ -1,6 +1,6 @@
 from functools import partial
 
-from numpy import where
+from numpy import where, percentile, mean, median, interp
 # from cosmicds.components.layer_toggle import LayerToggle
 from cosmicds.components.table import Table
 from cosmicds.phases import CDSState
@@ -661,6 +661,43 @@ class StageFour(HubbleStage):
         self._setup_scatter_layers()
         self._setup_histogram_layers()
         self._setup_complete = True
+
+    def inverse_cdf(self, array, x):
+        sorted_array = sorted(array)
+        perc = [100 * i/(len(array)-1) for i in range(len(sorted_array))]
+        return interp(x, perc, sorted_array)
+
+
+    def get_central_percentile_range(self, data, perc, center = 'median'):
+        # get the central percentile range of a data set
+        # center can be 'median' or 'mean'
+        # percentile is a float between 0 and 100
+        if center == 'median':
+            center = 50
+        elif center == 'mean':
+            center = self.inverse_cdf(data, mean(data))
+        
+        # now we need to balance in case the percentile range is too large
+        left = center - perc/2
+        right = center + perc/2
+        if left < 0:
+            right += abs(left)
+            left = 0
+        elif right > 100:
+            left -= (right - 100)
+            right = 100
+        
+        
+        left = percentile(data, center - perc/2)
+        right = percentile(data, center + perc/2)
+        
+    def get_percentile_from_range(self, data, low, high):
+        
+        left_perc = self.inverse_cdf(data, min(low, high))
+        right_perc = self.inverse_cdf(data, max(low, high))
+        
+        return left_perc, right_perc, right_perc - left_perc
+
 
     @property
     def all_viewers(self):
