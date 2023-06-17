@@ -153,6 +153,17 @@ class SingleBinSelect(InteractCheckableTool):
             self.roi = RangeROI(min=lo, max=hi, orientation=self._roi_orientation)
             self.viewer.apply_roi(self.roi)
     
+    @staticmethod
+    def binned_index(bins, x):
+        bin_width = bins[1] - bins[0]
+        return int((x - bins[0])/bin_width)
+    
+    @staticmethod
+    def binned_x(bins, x):
+        bin_width = bins[1] - bins[0]
+        index = int((x - bins[0])/bin_width)
+        return bins[0] + bin_width * (index + 1/2)
+    
     def bin_select(self, x):
         # select the histogram bin corresponding to the x-position of the selector line
         if x is None:
@@ -162,10 +173,10 @@ class SingleBinSelect(InteractCheckableTool):
         layer = viewer.layers[0]
         bins, hist = layer.bins, layer.hist
         dx = bins[1] - bins[0]
-        index = np.searchsorted(bins, x, side='right')
+        index = self.binned_index(bins, x)
         # only update the subset if the bin is not empty
         if self.allow_nonzero_bins or (hist[max(index-1,0)] > 0):
-            right_edge = bins[index]
+            right_edge = bins[0] + dx * (index + 1)
             left_edge = right_edge - dx
             self._bin_edges = left_edge, right_edge
             self._bin_center = (right_edge + left_edge) / 2
@@ -178,7 +189,7 @@ class SingleBinSelect(InteractCheckableTool):
         if self._bin_edges[0] == self._bin_edges[1]:
             return None
         return RangeSubsetState(lo=self._bin_edges[0], 
-                         hi=self._bin_edges[0], 
+                         hi=self._bin_edges[1], 
                          att=self.viewer.state.x_att)
     
     @property
