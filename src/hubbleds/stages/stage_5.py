@@ -412,8 +412,6 @@ class StageFour(HubbleStage):
 
         extend_tool(class_distr_viewer, 'bqplot:xrange',
                     hist_selection_activate, hist_selection_deactivate)
-        
-        self.extend_histogram_selection_tools()
     
         # We want the hub_fit_viewer to be selecting for the same subset as the table
         def fit_selection_activate():
@@ -677,6 +675,7 @@ class StageFour(HubbleStage):
             return
         self._setup_scatter_layers()
         self._setup_histogram_layers()
+        self.extend_histogram_selection_tools()
         self._setup_complete = True
     
     def extend_histogram_selection_tools(self):
