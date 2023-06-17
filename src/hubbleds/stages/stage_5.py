@@ -684,11 +684,27 @@ class StageFour(HubbleStage):
         all_distr_viewer_class = self.get_viewer("all_distr_viewer_class")
         all_distr_viewer_student = self.get_viewer("all_distr_viewer_student")
         
+        viewers = [class_distr_viewer, all_distr_viewer_class, all_distr_viewer_student]
+        
+        subsets = {viewer: {'one_bin_subset': None, 'range_bin_subset': None} for viewer in viewers}
+        
+        # create single_bin and range_bin subsets for each viewer
+        for i, viewer in enumerate(viewers):
+            sub_r = viewers[i].state.layers_data[0].new_subset(label = 'rangebinselect')
+            sub_1 = viewers[i].state.layers_data[0].new_subset(label = 'singlebinselect')
+            subsets[viewers[i]]['one_bin_subset'] = sub_1
+            subsets[viewers[i]]['range_bin_subset'] = sub_r
+            sub_1.style.color = 'green'
+            sub_1.style.alpha = 0.5
+            sub_r.style.color = 'red'
+            sub_r.style.alpha = 0.5
+
+
         def single_select_action(viewer):
-            print("single select action", viewer)
             tool = viewer.toolbar.tools['hubble:singlebinselect']
             selection = tool.selection
             if selection is not None:
+                subsets[viewer]['one_bin_subset'].subset_state = tool.subset_state
                 if viewer == class_distr_viewer:
                     self.stage_state.class_age = selection['bin_center']
                 elif viewer == all_distr_viewer_class:
@@ -697,10 +713,10 @@ class StageFour(HubbleStage):
                     self.stage_state.all_student_age = selection['bin_center']
         
         def range_select_action(viewer):
-            print("range select action", viewer)
             tool = viewer.toolbar.tools['hubble:binselect']
             selection = tool.selection
             if selection is not None:
+                subsets[viewer]['range_bin_subset'].subset_state = tool.subset_state
                 if viewer == class_distr_viewer:
                     self.stage_state.class_age_low = selection['bin_min']
                     self.stage_state.class_age_high = selection['bin_max']
@@ -711,9 +727,7 @@ class StageFour(HubbleStage):
                     self.stage_state.all_student_age_low = selection['bin_min']
                     self.stage_state.all_student_age_high = selection['bin_max']
         
-        viewers = [class_distr_viewer, all_distr_viewer_class, all_distr_viewer_student]
         for i, viewer in enumerate(viewers):
-            print('extending')
             extend_tool(viewers[i], 'hubble:singlebinselect', 
                         deactivate_cb = partial(single_select_action, viewers[i]))
             extend_tool(viewers[i], 'hubble:binselect', 
