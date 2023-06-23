@@ -665,7 +665,7 @@ class StageFour(HubbleStage):
     def inverse_cdf(self, array, x):
         sorted_array = sorted(array)
         perc = [100 * i/(len(array)-1) for i in range(len(sorted_array))]
-        return interp(x, perc, sorted_array)
+        return interp(x, sorted_array, perc)
 
 
     def get_central_percentile_range(self, data, perc, center = 'median'):
@@ -691,6 +691,7 @@ class StageFour(HubbleStage):
         left = percentile(data, center - perc/2)
         right = percentile(data, center + perc/2)
         
+        
     def get_percentile_from_range(self, data, low, high):
         
         left_perc = self.inverse_cdf(data, min(low, high))
@@ -699,6 +700,45 @@ class StageFour(HubbleStage):
         return left_perc, right_perc, right_perc - left_perc
 
 
+        
+    def get_tricky_percentile(histogram, percentile, v = False):
+        # here we want to estimate the percentile by ticking off values from the left and right until we reach the desired percentile
+        # assume histogram is sorted by x values and given in counts
+
+        totalN = len(histogram)
+        
+        finalN = int(totalN * percentile/100) # ⌊ n * p ⌋
+        
+        
+        hack_off = totalN - finalN # how many values we need to remove
+        hack_off_left = int(hack_off/2)
+        hack_off_right = totalN - hack_off_left
+        hack_off_left += (hack_off % 2)
+        
+
+        center_range = slice(hack_off_left, hack_off_right)
+        percentile_range = slice(0,hack_off_left), slice(hack_off_right, totalN)
+        
+        
+        sorted_hist = sorted(histogram)
+        
+        left = sorted_hist[percentile_range[0]]
+        right =  sorted_hist[percentile_range[1]]
+        middle = sorted_hist[center_range]
+        if v:
+            print('totalN',totalN)
+            print('finalN', finalN, 'final%',int(100 * (finalN/totalN)))
+            print(f"hack off {hack_off}  left N: {hack_off_left} right N: {hack_off_right}")
+
+
+            print(f"idx remove left: 0...{hack_off_left-1} right: {hack_off_right}...{totalN-1}")
+            print(f'range: {percentile_range}')
+            print(f'center: {center_range}')
+            print(len(left), len(middle), len(right))
+            print(left, middle, right)
+        
+        return min(middle), max(middle)
+    
     @property
     def all_viewers(self):
         return [layout.viewer for layout in self.viewers.values()]
