@@ -867,7 +867,6 @@ module.exports = {
       const isInteractStep = this.interact_steps.includes(newStep);
       const newCompleted = isInteractStep ? newStep - 1 : newStep;
       this.max_step_completed = Math.max(this.max_step_completed, newCompleted);
-      
     },
   },
 };
