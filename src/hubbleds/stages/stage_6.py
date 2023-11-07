@@ -206,7 +206,7 @@ class StageFive(HubbleStage):
         class_layer.state.zorder = 1
         class_layer.state.color = "#3A86FF"
         class_layer.state.alpha = 1
-        class_layer.state.size = 4
+        class_layer.state.size = 14
 
         prodata_viewer.state.x_att = class_data.id[DISTANCE_COMPONENT]
         prodata_viewer.state.y_att = class_data.id[VELOCITY_COMPONENT]
@@ -215,7 +215,7 @@ class StageFive(HubbleStage):
         student_layer = prodata_viewer.layer_artist_for_data(student_data)
         student_layer.state.color = '#FF7043'
         student_layer.state.zorder = 5
-        student_layer.state.size = 8                    
+        student_layer.state.size = 56                    
         student_layer.state.alpha = 1
         student_layer.state.visible = False
  
@@ -223,12 +223,14 @@ class StageFive(HubbleStage):
         prodata_viewer.add_data(hubble_data)
         hubble_layer = prodata_viewer.layer_artist_for_data(hubble_data)
         hubble_layer.state.color = '#D500F9'
+        hubble_layer.state.size = 21
         hubble_layer.state.visible = self.stage_state.marker_reached('pro_dat1')
         
         # load hubble key data
         prodata_viewer.add_data(hst_data)
         hst_layer = prodata_viewer.layer_artist_for_data(hst_data)
         hst_layer.state.color = '#AEEA00'
+        hst_layer.state.size = 21
         hst_layer.state.visible = self.stage_state.marker_reached('pro_dat5')
         
         prodata_viewer.state.reset_limits()

@@ -198,7 +198,7 @@
                   cols="12"
                   >
                   <p>
-                    Human error contributes to imperfect measurements too. Some people are more meticulous than others.
+                    Human error also contributes to imperfect measurements. Some people are more meticulous than others.
                   </p>
                   <p>
                     Sometimes our tools limit our measurements. For example, did you feel confident that you were able to measure the edges of your galaxies correctly?
@@ -298,9 +298,6 @@
                   <p>
                     Sometimes sources of systematic uncertainty bias our results in different directions, effectively cancelling each other out in a lucky coincidence.
                   </p>
-                  <p>
-                    Scientists try to eliminate as many sources of systematic bias as possible when designing an experiment.
-                  </p>
                 </v-col>
               </v-row>
             </v-container>
@@ -308,6 +305,23 @@
         </v-window-item>
 
         <v-window-item :value="8" class="no-transition">
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col> 
+                  <p>
+                    Scientists try to eliminate as many sources of systematic bias as possible designing an experiment. Figuring out and accounting for all possible sources of systematic uncertainty is one of the most difficult (and most important!) tasks in science. 
+                  </p>
+                  <p>  
+                    Because our time is limited, from here on out, our exploration of uncertainties will focus only on <strong>random</strong> uncertainties.
+                  </p>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+        </v-window-item>
+
+        <v-window-item :value="9" class="no-transition">
           <v-card-text>
             <v-container>
               <v-row>
@@ -328,7 +342,8 @@
               </v-row>
             </v-container>
           </v-card-text>
-        </v-window-item> 
+        </v-window-item>  
+        
       </v-window> 
       <v-divider></v-divider>
 

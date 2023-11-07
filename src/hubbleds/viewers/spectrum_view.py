@@ -1,19 +1,18 @@
 from bqplot import Label
 from bqplot.marks import Lines
 from cosmicds.components.toolbar import Toolbar
-from echo import delay_callback, CallbackProperty
+from echo import delay_callback
 from glue.config import viewer_tool
 from glue.viewers.common.utils import get_viewer_tools
 from glue.viewers.scatter.state import ScatterViewerState
-from glue_jupyter.bqplot.scatter import BqplotScatterView, \
-    BqplotScatterLayerArtist
+from glue_jupyter.bqplot.scatter import BqplotScatterView
 import numpy as np
 
 from cosmicds.mixins import LineHoverStateMixin, LineHoverViewerMixin
 from cosmicds.viewers.cds_viewer import cds_viewer
 from ..utils import H_ALPHA_REST_LAMBDA, MG_REST_LAMBDA
 
-__all__ = ['SpectrumView', 'SpectrumViewLayerArtist', 'SpectrumViewerState']
+__all__ = ['SpectrumView', 'SpectrumViewerState']
 
 
 class SpectrumViewerState(LineHoverStateMixin, ScatterViewerState):
@@ -40,23 +39,8 @@ class SpectrumViewerState(LineHoverStateMixin, ScatterViewerState):
             self.y_max = self._YMAX_FACTOR * new_ymax
             self.resolution_y *= (self.y_max - self.y_min) / (ymax - ymin)
 
-   
-
-class SpectrumViewLayerArtist(BqplotScatterLayerArtist):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        old_scatter = self.scatter
-        self.scatter = Lines(scales=self.scales, x=[0, 1], y=[0, 1],
-                             marker=None, colors=['#507FB6'], stroke_width=1.8)
-        self.view.figure.marks = list(
-            filter(lambda x: x is not old_scatter, self.view.figure.marks)) + [
-                                     self.scatter]
-
 
 class SpecView(LineHoverViewerMixin, BqplotScatterView):
-    _data_artist_cls = SpectrumViewLayerArtist
-    _subset_artist_cls = SpectrumViewLayerArtist
 
     inherit_tools = False
     tools = ['bqplot:home', 'hubble:wavezoom', 'hubble:restwave'] # remove 'cds:info' for now
@@ -147,7 +131,7 @@ class SpecView(LineHoverViewerMixin, BqplotScatterView):
             self.previous_label_background.x = self._x_background_coordinates(
                 previous)
         self.element_label.x = [self.shifted, self.shifted]
-        self.element_label.text = [element]
+        self.element_label.text = [f"{element} (observed)"]
         self.element_tick.x = [self.shifted, self.shifted]
         self._update_locations()
         self._resolution_dirty = True
@@ -160,6 +144,12 @@ class SpecView(LineHoverViewerMixin, BqplotScatterView):
         for layer in self.layers:
             if layer.state.layer.label != data.label:
                 layer.state.visible = False
+            else:
+                layer.state.color = "#507FB6"
+                layer.state.alpha = 1
+                layer.state.markers_visible = False
+                layer.state.line_visible = True
+                layer.state.linewidth = 1.8
 
         bring_to_front = [
             self.previous_label_background, self.previous_line,

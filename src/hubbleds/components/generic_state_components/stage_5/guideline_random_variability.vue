@@ -8,13 +8,7 @@
       class="mb-4"
     >
       <p>
-        To make it possible to estimate the universe’s age in the short amount of time that we have, we made an assumption that has introduced a large amount of uncertainty in everyone’s measurement. That is the assumption that all galaxies are the same size as the Milky Way. Many galaxies are larger and many are smaller, so the distances you measured may be very different from their true distances.
-      </p>
-      <p>
-        This random variability in galaxy size means that any one measurement that uses only 5 galaxies may be very different from another measurement that uses a different group of 5 galaxies.
-      </p>
-      <p>
-        Let’s look at the results from each student in your class to see what we mean by this.
+        Due to the shortcomings you just considered, your age estimate may or may not reflect the "true" age of the universe, especially since you have a pretty small sample of only 5 galaxies. It might help to explore data from your classmates and others who have completed this Data Story.  
       </p>
     </div>
   </scaffold-alert>

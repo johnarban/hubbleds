@@ -1,8 +1,6 @@
 from functools import partial
-from os.path import join
-from pathlib import Path
 
-from numpy import asarray, where
+from numpy import where
 from cosmicds.components.layer_toggle import LayerToggle
 from cosmicds.components.table import Table
 from cosmicds.phases import CDSState
@@ -185,7 +183,6 @@ class StageThree(HubbleStage):
             self.stage_state.marker = 'tre_lin1'
 
         student_data = self.get_data(STUDENT_DATA_LABEL)
-        class_meas_data = self.get_data(CLASS_DATA_LABEL)
 
         fit_table = Table(self.session,
                           data=student_data,
@@ -352,23 +349,23 @@ class StageThree(HubbleStage):
         student_data = self.get_data(STUDENT_DATA_LABEL)
         class_meas_data = self.get_data(CLASS_DATA_LABEL)
         layer_viewer.add_data(student_data)
-        layer_viewer.state.x_att = student_data.id[DISTANCE_COMPONENT]
-        layer_viewer.state.y_att = student_data.id[VELOCITY_COMPONENT]
         
         # PALETTE: Y:FFBE0B, O:FB5607, Pi:FF006E, Pu:8338EC, Bl:3A86FF, LiBl:619EFF
         student_layer = layer_viewer.layer_artist_for_data(student_data)
         student_layer.state.color = '#FB5607'
         student_layer.state.zorder = 5
-        student_layer.state.size = 8                    
+        student_layer.state.size = 56
         student_layer.state.alpha = 1
         # add class measurement data and hide by default
         layer_viewer.add_data(class_meas_data)
+        layer_viewer.state.x_att = class_meas_data.id[DISTANCE_COMPONENT]
+        layer_viewer.state.y_att = class_meas_data.id[VELOCITY_COMPONENT]
         layer_viewer.state.reset_limits()
         class_layer = layer_viewer.layer_artist_for_data(class_meas_data)
         class_layer.state.zorder = 1
         class_layer.state.color = "#3A86FF"
         class_layer.state.alpha = 1
-        class_layer.state.size = 4
+        class_layer.state.size = 14
         class_layer.state.visible = False
 
         # cosmicds PR157 - turn off fit line label for layer_viewer
@@ -407,7 +404,7 @@ class StageThree(HubbleStage):
         race_layer = race_viewer.layer_artist_for_data(race_data)
         race_layer.state.color = '#111111'
         race_layer.state.alpha = 1
-        race_layer.state.size = 8
+        race_layer.state.size = 56
         race_viewer.state.reset_limits()
         race_viewer.state.x_max = 1.1 * race_viewer.state.x_max 
         race_viewer.state.y_max = 1.1 * race_viewer.state.y_max 
@@ -446,7 +443,8 @@ class StageThree(HubbleStage):
     def _reset_limits_for_data(self, label):
         viewer_id = self.viewer_ids_for_data.get(label, [])
         for vid in viewer_id:
-            self.get_viewer(vid).state.reset_limits()
+            visible_only = vid != "layer_viewer"
+            self.get_viewer(vid).state.reset_limits(visible_only=visible_only)
 
     def _on_data_change(self, msg):
         label = msg.data.label

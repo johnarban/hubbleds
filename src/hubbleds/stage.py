@@ -1,7 +1,6 @@
 import json
 
 import ipyvuetify as v
-import requests
 from cosmicds.components import Table
 from cosmicds.phases import Stage
 from cosmicds.utils import API_URL, CDSJSONEncoder
@@ -50,19 +49,14 @@ class HubbleStage(Stage):
     def submit_measurement(self, measurement):
         if self.app_state.update_db:
             prepared = self._prepare_measurement(measurement)
-            #print('submit now')
-            requests.put(f"{API_URL}/{HUBBLE_ROUTE_PATH}/submit-measurement",
+            self._request_session.put(f"{API_URL}/{HUBBLE_ROUTE_PATH}/submit-measurement",
                         json=prepared)
-            
-    
+   
     def submit_example_galaxy_measurement(self, measurement):
         if self.app_state.update_db:
-            #print('SUBMITTING EXAMPLE GALAXY MEASUREMENT')
             prepared = self._prepare_sample_measurement(measurement)
-            endpoint = f"{API_URL}/{HUBBLE_ROUTE_PATH}/sample-measurement/"
-            req = requests.put(endpoint, json=prepared)
-            #print(req.__dict__)
-
+            endpoint = f"{API_URL}/{HUBBLE_ROUTE_PATH}/sample-measurement"
+            self._request_session.put(endpoint, json=prepared)
 
     def remove_measurement(self, galaxy_name):
         name = str(galaxy_name)
@@ -73,12 +67,11 @@ class HubbleStage(Stage):
                                 single=True)
         user = self.app_state.student
         if self.app_state.update_db and user.get("id", None) is not None:
-            requests.delete(
+            self._request_session.delete(
                 f"{API_URL}/{HUBBLE_ROUTE_PATH}/measurement/{user['id']}/{galaxy_name}")
 
     def update_data_value(self, dc_name, comp_name, value, index, block_submit=False):
         super().update_data_value(dc_name, comp_name, value, index)
-        #print('update data value', dc_name)
         if dc_name not in [STUDENT_MEASUREMENTS_LABEL, EXAMPLE_GALAXY_MEASUREMENTS]:
             return
 
@@ -107,8 +100,18 @@ class HubbleStage(Stage):
             if dc_name == STUDENT_MEASUREMENTS_LABEL:
                 self.submit_measurement(measurement)
             elif dc_name == EXAMPLE_GALAXY_MEASUREMENTS:
-                pass
                 self.submit_example_galaxy_measurement(measurement)
+    
+    def upload_example_galaxy_table(self):
+        data = self.data_collection[EXAMPLE_GALAXY_MEASUREMENTS]
+        df = data.to_dataframe()
+        # Submit a measurement, if necessary
+        if self.app_state.update_db:
+            for index in range(len(df)):
+                measurement = {comp.label: data[comp][index] for comp in
+                            data.main_components}
+                self.submit_example_galaxy_measurement(measurement)
+        
 
     def add_data_values(self, dc_name, values):
         super().add_data_values(dc_name, values)
@@ -126,3 +129,4 @@ class HubbleStage(Stage):
         for widget in self.widgets.values():
             if isinstance(widget, Table):
                 widget.selected_color = color
+

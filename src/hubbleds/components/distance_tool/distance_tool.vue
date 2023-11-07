@@ -29,6 +29,20 @@
       </v-btn>
     </v-toolbar>
     <div class="distance-content">
+      <!-- <v-snackbar
+        v-model="bad_measurement"
+        transition="fab-transition"
+        timeout="5000"
+        top
+        right
+        color="warning lighten-2"
+        class="pa-4 black--text"
+        style="font-size: 1.25rem;"
+        multi-line
+        elevation="24"
+      >
+        You've measured an impossible size for the galaxy. Please try again.
+      </v-snackbar> -->
       <canvas
         v-show="measuring"
         class="distance-canvas"
@@ -69,17 +83,17 @@
         {{ measuring ? 'Stop measuring' : 'Start measuring' }}
       </v-tooltip>
     </div>
-            <contrast-brightness-control 
-                inlineStyle="padding: 0.5em 0;"
-                :enabled=true  
-                :showContrast=false
-                :reset="reset_style"
-                @change_style="new_brightness_contrast => {this.wwtStyle = new_brightness_contrast}"
-                @change_brightness="(new_brightness) => { $emit('brightness', new_brightness)}"
-                @change_contrast="(new_contrast) => { $emit('contrast', new_contrast)}"
-                />
-                
-                <!-- add inline style to control using inline css like inlineStyle="border: 1px solid white" -->
+    <contrast-brightness-control 
+        inlineStyle="padding: 0.5em 0;"
+        :enabled=true  
+        :showContrast=false
+        :reset="reset_style"
+        @change_style="new_brightness_contrast => this.wwtStyle = new_brightness_contrast"
+        @change_brightness="(new_brightness) => $emit('brightness', new_brightness)"
+        @change_contrast="(new_contrast) => $emit('contrast', new_contrast)"
+        />
+        
+        <!-- add inline style to control using inline css like inlineStyle="border: 1px solid white" -->
   </v-card>
 </template>
 
@@ -201,11 +215,12 @@ export default {
       this.lineCreated = false;
       this.measuredDistance = 0;
       this.measuring = false;
+      this.hasMovedWhileDrawing = false;
 
       // Set the canvas handlers
-      this.canvas.onmousemove = null;
+      this.canvas.onmousemove = this.handleMouseMove;
       this.canvas.onmousedown = this.addInitialPoint;
-      this.canvas.onmouseup = this.addInitialPoint;
+      this.canvas.onmouseup = null;
 
       // Clear the canvas, if necessary
       this.clearCanvas();
@@ -228,6 +243,12 @@ export default {
 
       // If we haven't put the second point down
       } else if (this.endPoint === null) {
+
+        // If we haven't moved since we put the first point down, do nothing
+        if (!this.hasMovedWhileDrawing) {
+          return;
+        }
+
         this.endPoint = coordinates;
         this.clearCanvas();
         this.drawLine(this.startPoint, this.endPoint);
@@ -243,24 +264,37 @@ export default {
     handleMouseDown: function(event) {
       this.mouseDown = true;
 
-      // If we aren't on one of the endpoints,
+      // If we aren't drawing the line
+      // and we aren't on one of the endpoints,
       // then we're done here
-      if (!(this.onStart || this.onEnd)) {
+      if (!(this.onStart || this.onEnd || this.shouldFollowMouse)) {
         event.stopImmediatePropagation();
         return;
       }
 
       // To make things easier, we define the point that
       // isn't being modified as the 'start' point
-      if (this.onStart) {
+      if (!this.shouldFollowMouse && this.onStart) {
         const tempPoint = this.startPoint;
         this.startPoint = this.endPoint;
         this.endPoint = tempPoint;
       }
       this.clearCanvas();
       this.drawPoint(this.startPoint);
-      this.canvas.classList.add(this.grabbingClass);
-      this.shouldFollowMouse = true;
+      if (this.canvas.classList.contains(this.grabbingClass)) {
+        this.canvas.classList.remove(this.grabbingClass);
+      } else {
+        this.canvas.classList.add(this.grabbingClass);
+      }
+
+      if (this.shouldFollowMouse) {
+        this.endPoint = this.position(event);
+        this.clearCanvas();
+        this.drawLine(this.startPoint, this.endPoint);
+        this.drawEndcaps(this.startPoint, this.endPoint);
+        this.updateMeasuredDistance();
+      }
+      this.shouldFollowMouse = !this.shouldFollowMouse;
 
       // To avoid the line 'vanishing' when we grab an endpoint
       // we draw a line from the other point to where the mouse it
@@ -269,23 +303,15 @@ export default {
 
     handleMouseUp: function(event) {
       this.mouseDown = false;
-      if (this.shouldFollowMouse) {
-        this.endPoint = this.position(event);
-        this.clearCanvas();
-        this.drawLine(this.startPoint, this.endPoint);
-        this.drawEndcaps(this.startPoint, this.endPoint);
-        this.updateMeasuredDistance();
-      }
-      this.canvas.classList.remove(this.grabbingClass);
       this.mouseMoving = false;
-      this.shouldFollowMouse = false;
     },
 
     handleMouseMove: function(event) {
       this.mouseMoving = true;
-      if (this.shouldFollowMouse && this.mouseDown) {
-        this.lineFollow(event, true);
-      } else {
+      if (this.shouldFollowMouse) {
+        this.hasMovedWhileDrawing = true;
+        this.lineFollow(event, false);
+      } else if (this.startPoint && this.endPoint) {
         this.lookForEndpoints(event);
       }
     },
@@ -355,6 +381,7 @@ export default {
 
     lineFollow: function(event, requireMouseDown) {
       this.mouseMoving = true;
+      this.hasMovedWhileDrawing = true;
       if (requireMouseDown && !this.mouseDown) { return; }
       const coordinates = this.position(event);
       this.clearCanvas();
@@ -372,7 +399,7 @@ export default {
     },
 
     perpSlope: function(p1=this.startPoint, p2=this.endPoint) {
-      if (!(p1 && p2)) { return undefined; }
+      if (!(p1 && p2)) { return 1; }
       return (p1[0] - p2[0]) / (p2[1] - p1[1]);
     },
 

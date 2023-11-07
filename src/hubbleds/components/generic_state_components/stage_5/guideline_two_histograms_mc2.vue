@@ -14,14 +14,11 @@
     <div
       class="mb-4"
     >
-      <p>
-        Let’s come back to the 2 histograms of age values for the universe obtained by all students vs. all classes.
-      </p>
       <v-container
         class="px-0"
         fluid
       >
-        <p>Which histogram spans a bigger range of ages?</p>
+        <p>In comparing the All Students and All Classes histogram, which spans a larger range of ages?</p>
         <mc-radiogroup
           :radio-options="[
             'The histogram of student measurements.',
@@ -29,7 +26,7 @@
             'The student and class histograms are the same.'
           ]"
           :feedbacks="[
-            'That’s right. The student histogram has a bigger range, telling us that there is more random uncertainty in the student measurements than in the class measurements.',
+            'That’s right. The student histogram has a larger range.',
             'Not quite. Look at the x-axis for each histogram. Where does the range of values start and end for each histogram? Try again.',
             'Not quite. Look at the x-axis for each histogram. Where does the range of values start and end for each histogram? Try again.'
           ]"

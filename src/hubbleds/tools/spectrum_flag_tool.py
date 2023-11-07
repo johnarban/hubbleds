@@ -1,5 +1,4 @@
-import requests
-from cosmicds.utils import API_URL
+from cosmicds.utils import API_URL, request_session
 from echo import CallbackProperty
 from glue.config import viewer_tool
 from glue.viewers.common.tool import Tool
@@ -16,11 +15,13 @@ class SpectrumFlagTool(Tool):
 
     flagged = CallbackProperty(False)
 
+    _request_session = request_session()
+
     def activate(self):
         galaxy_name = self.viewer.spectrum_name
         if not galaxy_name.endswith(".fits"):
             galaxy_name += ".fits"
         data = {"galaxy_name": galaxy_name}
-        requests.post(f"{API_URL}/{HUBBLE_ROUTE_PATH}/mark-spectrum-bad",
+        self._request_session.post(f"{API_URL}/{HUBBLE_ROUTE_PATH}/mark-spectrum-bad",
                       json=data)
         self.flagged = True

@@ -39,7 +39,7 @@
       ]
     },
     "viewer": {
-      "scatter": {
+      "scatter_mark": {
         "stroke_width": 2,
         "enable_hover": true
       },

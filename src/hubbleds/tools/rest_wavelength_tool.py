@@ -71,7 +71,7 @@ class RestWavelengthTool(CheckableTool):
     def deactivate(self):
         self.viewer.figure.marks = [mark for mark in self.viewer.figure.marks
                                     if mark not in self.marks]
-        self.viewer.element_label.text = [self.viewer.element]
+        self.viewer.element_label.text = [f"{self.viewer.element} (observed)"]
         self.active = False
         self.lambda_on = False
 

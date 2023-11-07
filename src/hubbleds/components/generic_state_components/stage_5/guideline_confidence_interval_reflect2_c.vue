@@ -9,16 +9,16 @@
       class="mb-4"
     >
       <p>
-        Earlier, your best guess for the age of the universe was: <StudentResponse class="StudentResponses">{{ state.age_calc_state.best_guess }}</StudentResponse>&nbsp;Gyr, with a likely range from <StudentResponse class="StudentResponses">{{ state.age_calc_state.low_guess }}</StudentResponse>&nbsp;to <StudentResponse class="StudentResponses">{{ state.age_calc_state.high_guess }}</StudentResponse>&nbsp;Gyr.
+        From your class's data, you determined that the most likely value for the age of the universe was: <StudentResponse class="StudentResponses">{{ state.age_calc_state.best_guess }}</StudentResponse>&nbsp;Gyr, with a confidence interval from <StudentResponse class="StudentResponses">{{ state.age_calc_state.low_guess }}</StudentResponse>&nbsp;to <StudentResponse class="StudentResponses">{{ state.age_calc_state.high_guess }}</StudentResponse>&nbsp;Gyr.
       </p>
       <p>
-        After exploring data from all the other classes, you might consider updating your values.
+        Update your responses based on the additional data from this larger All Classes data set.
       </p>
       <v-row>
         <v-col
           cols="12"
           lg="9">      
-          1. My new best guess for the age of the universe based on my entire class’s data set: 
+          1. My new most likely value for the age of the universe based on the data set from All Classes: 
         </v-col>
         <v-col>
           <v-btn
@@ -58,7 +58,12 @@
                   </span>
                 </v-toolbar>
                 <div class="pa-6">
-                  A gold standard in scientific practice is reproducibility. If someone else performs a procedure you did and obtains the same or very similar result, that means your result was reproducible and is therefore more plausible.
+                  <p>
+                    Sometimes, the mean, median, and mode of a distribution all have the same value. That value would be a strong candidate for being the most likely value based on the distribution.
+                  </p>
+                  <p>
+                    When the values do not agree, you can choose any of the mean, median or mode, or even something different, as long as you justify why you chose it. You can review what each quantity represents and when scientists might use it by clicking the <v-icon>mdi-help-circle-outline</v-icon> next to it.
+                  </p>
                 </div>
               </v-card>
             </v-dialog>
@@ -73,8 +78,8 @@
           <free-response
             outlined
             rows="1"
-            label="New Best Guess Age"
-            tag="new-best-guess-age"
+            label="New Most Likely Age"
+            tag="new-most-likely-age"
           ></free-response>
         </v-col>
         <v-col>
@@ -87,7 +92,7 @@
           cols="12"
           lg="9"
         >
-          2. My best guess for the likely range of ages of the universe based on my entire class’s data set: 
+          2. The new range of age values for the universe that I am most confident in based on the data set from All Classes: 
         </v-col>
         <v-col>
           <v-btn
@@ -175,7 +180,7 @@
       </v-row>
 
       <p class="mt-4">
-        3. Explain why you chose these new values based on the all-classes data:
+        3. Explain why you chose these new values based on the All Classes data:
       </p>
       <free-response
         outlined

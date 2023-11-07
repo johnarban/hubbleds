@@ -2,14 +2,13 @@ from datetime import datetime
 
 import astropy.units as u
 import ipyvue as v
-import requests
 from astropy.coordinates import Angle, SkyCoord
-from cosmicds.utils import RepeatedTimer, load_template, API_URL
+from cosmicds.utils import RepeatedTimer, load_template
 from ipywidgets import DOMWidget, widget_serialization
 from pywwt.jupyter import WWTJupyterWidget
 from traitlets import Instance, Bool, Float, Int, Unicode, observe, Dict
 
-from ...utils import GALAXY_FOV, HUBBLE_ROUTE_PATH, angle_to_json, \
+from ...utils import GALAXY_FOV, angle_to_json, \
     angle_from_json
 
 
@@ -38,6 +37,12 @@ class DistanceTool(v.VueTemplate):
     _dec = Angle(0 * u.deg)
     wwtStyle = Dict().tag(sync=True)
     reset_style = Bool(False).tag(sync=True)
+    
+    # Guard
+    guard = Bool(False).tag(sync=True)
+    galaxy_max_size = Angle("60 arcmin") # 2 x Pinwheel galaxy (d = 7 Mpc, r = 1.7 Rmw)
+    galaxy_min_size = Angle("6 arcsec") # 3 x sdss resoltuion
+    bad_measurement = Bool(False).tag(sync=True)
 
     UPDATE_TIME = 1  # seconds
     START_COORDINATES = SkyCoord(180 * u.deg, 25 * u.deg, frame='icrs')
@@ -46,6 +51,7 @@ class DistanceTool(v.VueTemplate):
         self.widget = WWTJupyterWidget(hide_all_chrome=True)
         self._setup_widget()
         self.measuring = kwargs.get('measuring', False)
+        self.guard = kwargs.get('guard', False)
         self.angular_size = Angle(0, u.deg)
         self.angular_height = Angle(60, u.deg)
         self.widget._set_message_type_callback('wwt_view_state',
@@ -89,7 +95,12 @@ class DistanceTool(v.VueTemplate):
     def _on_measured_distance_changed(self, change):
         fov = self.widget.get_fov()
         widget_height = self._height_from_pixel_str(self.widget.layout.height)
-        self.angular_size = Angle(((change["new"] / widget_height) * fov))
+        ang_size = Angle(((change["new"] / widget_height) * fov))
+        valid = self.validate_angular_size(ang_size, True)
+        # print(ang_size, change["new"], valid)
+        # if valid:
+        #     print('valid measurement')
+        self.angular_size = ang_size
         self.measurement_count += 1
 
     @observe('measuring')
@@ -137,4 +148,29 @@ class DistanceTool(v.VueTemplate):
         # toggle reset style to trigger watch in vue
         self.reset_style = True
         self.reset_style = False
- 
+    
+    def activate_guard(self):
+        self.guard = True
+        
+    def deactivate_guard(self):
+        self.guard = False
+        self.bad_measurement = False
+        
+    def set_guard(self, max = None, min = None):
+        self.activate_guard()
+        self.galaxy_max_size = Angle(max) if max is not None else self.galaxy_max_size
+        self.galaxy_min_size = Angle(min) if min is not None else  self.galaxy_min_size
+    
+    def validate_angular_size(self, angular_size, check = True):
+        if not self.guard:
+            return True
+        if not check:
+            return self.bad_measurement
+        max_wwt_size = Angle("60 deg")
+        c1 = (angular_size < max_wwt_size) 
+        c2 = (angular_size >= self.galaxy_min_size) 
+        c3 = (angular_size <= self.galaxy_max_size)
+        self.bad_measurement = not (c1 and c2 and c3)
+        return c1 and c2 and c3
+    
+    

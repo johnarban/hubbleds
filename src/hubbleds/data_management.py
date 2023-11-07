@@ -19,6 +19,7 @@ EXAMPLE_GALAXY_MEASUREMENTS = "example_galaxy_data"
 EXAMPLE_GALAXY_STUDENT_DATA = "example_galaxy_student_data"
 
 STUDENT_SLIDER_SUBSET_LABEL = "student_slider_subset"
+CLASS_SLIDER_SUBSET_LABEL = "class_slider_subset"
 
 ### Data Components
 
@@ -89,6 +90,11 @@ DB_MEASUREMENT_FIELDS = [
     DB_ELEMENT_FIELD,
     DB_STUDENT_ID_FIELD,
     DB_LAST_MODIFIED_FIELD
+]
+
+DB_SAMPLE_MEASUREMENT_FIELDS = [
+    DB_MEASNUM_FIELD,
+    DB_BRIGHT_FIELD
 ]
 
 # Summaries

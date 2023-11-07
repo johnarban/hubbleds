@@ -1,11 +1,9 @@
 import astropy.units as u
 import ipyvue as v
-import requests
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
-from cosmicds.utils import API_URL
+from cosmicds.utils import API_URL, request_session
 from cosmicds.utils import load_template
-from glue_jupyter.state_traitlets_helpers import GlueState
 from ipywidgets import DOMWidget, widget_serialization
 from pandas import DataFrame, concat
 from pywwt.jupyter import WWTJupyterWidget
@@ -56,6 +54,8 @@ class SelectionTool(v.VueTemplate):
         self.current_galaxy = {}
         self.candidate_galaxy = {}
         self._on_galaxy_selected = None
+
+        self._request_session = request_session()
 
         def wwt_cb(wwt, updated):
             if ('most_recent_source' not in updated or
@@ -156,5 +156,5 @@ class SelectionTool(v.VueTemplate):
             if not name.endswith(".fits"):
                 name += ".fits"
             data = {"galaxy_name": name}
-        requests.put(f"{API_URL}/{HUBBLE_ROUTE_PATH}/mark-galaxy-bad",
+        self._request_session.put(f"{API_URL}/{HUBBLE_ROUTE_PATH}/mark-galaxy-bad",
                      json=data)

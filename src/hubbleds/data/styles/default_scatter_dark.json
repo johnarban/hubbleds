@@ -36,7 +36,7 @@
     ]
   },
   "viewer": {
-    "scatter": {
+    "scatter_mark": {
       "enable_hover": true
     }
   }

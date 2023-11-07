@@ -14,10 +14,10 @@
       class="mb-4"
     >
       <p>
-        Everyone who participated in this data story followed the same procedure, measuring velocities and distances to galaxies, but they obtained different age values for the universe, given in these histograms. The student histogram tells you <strong>how many students</strong> obtained a particular age value, and the class histogram tells you <strong>how many classes</strong> obtained a particular age value.
+        Another data set to explore are the age values measured by All Students who have completed this Data Story. 
       </p>
       <p>
-        The student values are in the top graph and the class values are in the bottom graph.
+        Notice how the All Students histogram (top) differs from the All Classes histogram (bottom).
       </p>
     </div>
   </scaffold-alert>

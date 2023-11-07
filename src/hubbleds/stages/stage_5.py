@@ -1,12 +1,14 @@
 from functools import partial
+from math import ceil, floor
+from glue.core.subset import RangeSubsetState
 
 from numpy import where
 # from cosmicds.components.layer_toggle import LayerToggle
-from cosmicds.components.table import Table
+from cosmicds.components import PercentageSelector, StatisticsSelector, Table 
 from cosmicds.phases import CDSState
 from cosmicds.registries import register_stage
 from cosmicds.utils import extend_tool, load_template, update_figure_css
-from echo import CallbackProperty, DictCallbackProperty, add_callback, callback_property, ListCallbackProperty
+from echo import CallbackProperty, DictCallbackProperty, add_callback, callback_property, ListCallbackProperty, delay_callback
 from glue.core.message import NumericalDataChangedMessage
 from glue_jupyter.link import link
 from hubbleds.components.id_slider import IDSlider
@@ -25,7 +27,10 @@ demo = True
 class StageState(CDSState):
     relage_response = CallbackProperty(False)
     two_hist_response = CallbackProperty(False)
+    two_hist3_response = CallbackProperty(False)
+    # two_hist4_response = CallbackProperty(False)
     lack_bias_response = CallbackProperty(False)
+    uncertainty_hint_dialog = CallbackProperty(False)
     class_trend_line_drawn = CallbackProperty(False)
     class_best_fit_clicked = CallbackProperty(False)
     
@@ -36,7 +41,7 @@ class StageState(CDSState):
     uncertainty_dialog_complete = CallbackProperty(False)
     uncertainty_state = DictCallbackProperty({
         'step': 0,
-        'length': 9,
+        'length': 10,
         'titles': [
             'What is the true age of the universe?',
             "Shortcomings in our measurements",
@@ -46,7 +51,23 @@ class StageState(CDSState):
             "Random Uncertainty (Noise)",
             "Systematic Uncertainty (Bias)",
             "Causes of Systematic Uncertainty",
+            "Systematic Uncertainty",
             "Finished Uncertainty Tutorial",
+        ]
+    })
+    
+    define_outlier = CallbackProperty(False)
+    
+    mmm_dialog = CallbackProperty(False)
+    mmm_dialog_opened = CallbackProperty(False)
+    mmm_dialog_complete = CallbackProperty(False)
+    mmm_state = DictCallbackProperty({
+        'step': 0,
+        'length': 3,
+        'titles': [
+            'Mean',
+            "Median",
+            "Mode"
         ]
     })
 
@@ -54,7 +75,8 @@ class StageState(CDSState):
     indices = CallbackProperty({})
     advance_marker = CallbackProperty(True)
 
-    image_location = CallbackProperty(f"{IMAGE_BASE_URL}/stage_three") #this needs to be updated if we have real Stage 4 images
+    image_location = CallbackProperty(f"{IMAGE_BASE_URL}/mean_median_mode") 
+    class_data_size = CallbackProperty(0)
 
     hypgal_distance = CallbackProperty(0)
     hypgal_velocity = CallbackProperty(0)
@@ -85,10 +107,17 @@ class StageState(CDSState):
         'cla_age2',
         'cla_age3',
         'cla_age4',
-        'con_int1',
+        'lea_unc1',
+        'mos_lik1', 
         'age_dis1',
+        'mos_lik2',
+        'mos_lik3',
+        'mos_lik4',
+        'con_int1',
         'con_int2',
-        
+        'con_int3',
+
+        'cla_dat1',
         'tre_lin2c',
         'bes_fit1c',
         'you_age1c',
@@ -98,13 +127,15 @@ class StageState(CDSState):
         'con_int2c',
         
         'two_his1',
-        'lea_unc1',
         'two_his2',
-        'lac_bia1',
+        'two_his3',
+        # 'two_his4', cutting because it's too long redundant
+        'two_his5',
+        #'lac_bia1',
         #'lac_bia2',
-        'lac_bia3',
+        #'lac_bia3',
         'mor_dat1',
-        'acc_unc1',
+        #'acc_unc1',
         
     ])
     
@@ -245,6 +276,9 @@ class StageFour(HubbleStage):
         class_meas_data = self.get_data(CLASS_DATA_LABEL)
         all_data = self.get_data(ALL_DATA_LABEL)
 
+        # Set the size from the class data
+        self.stage_state.class_data_size = int(self.get_data(CLASS_DATA_LABEL).size / 5)
+
         fit_table = Table(self.session,
                           data=student_data,
                           glue_components=[NAME_COMPONENT,
@@ -268,11 +302,11 @@ class StageFour(HubbleStage):
         comparison_viewer = self.add_viewer(HubbleScatterView, "comparison_viewer", "Data Comparison")
         all_viewer = self.add_viewer(HubbleScatterView, "all_viewer", "All Data")
         class_distr_viewer = self.add_viewer(HubbleClassHistogramView,
-                                             'class_distr_viewer', "My Class")
+                                             'class_distr_viewer', "My Class Ages (5 galaxies each)")
         all_distr_viewer_student = self.add_viewer(HubbleHistogramView,
-                                           'all_distr_viewer_student', "All Students") # really just All students, but need the title bar
+                                           'all_distr_viewer_student', "All Student Ages (5 galaxies each)") # really just All students, but need the title bar
         all_distr_viewer_class = self.add_viewer(HubbleHistogramView,
-                                           'all_distr_viewer_class', "All Classes")
+                                           'all_distr_viewer_class', "All Class Ages (~100 galaxies each)")
         all_distr_viewer_class.toolbar.tools['bqplot:home'].old_activate = all_distr_viewer_class.toolbar.tools['bqplot:home'].activate
 
         add_callback(self.stage_state, 'marker',
@@ -288,6 +322,7 @@ class StageFour(HubbleStage):
         # Grab data
         class_summ_data = self.get_data(CLASS_SUMMARY_LABEL)
         classes_summary_data = self.get_data(ALL_CLASS_SUMMARIES_LABEL)
+        students_summary_data = self.get_data(ALL_STUDENT_SUMMARIES_LABEL)
 
         # Set up the listener to sync the histogram <--> scatter viewers
 
@@ -306,13 +341,13 @@ class StageFour(HubbleStage):
                                                     modify_subset_label=histogram_modify_label)
 
         # Create the student slider
-        student_slider_subset_label = STUDENT_SLIDER_SUBSET_LABEL
-        self.student_slider_subset = class_meas_data.new_subset(label=student_slider_subset_label)
+        self.student_slider_subset = class_meas_data.new_subset(label=STUDENT_SLIDER_SUBSET_LABEL)
         self.student_slider_subset.style.alpha = 1
+        self.student_slider_subset.style.markersize = 56
         student_slider = IDSlider(class_summ_data, STUDENT_ID_COMPONENT, AGE_COMPONENT, highlight_ids=[self.story_state.student_user["id"]])
         self.add_component(student_slider, "py-student-slider")
         def student_slider_change(id, highlighted):
-            self.student_slider_subset.subset_state = class_meas_data['student_id'] == id
+            self.student_slider_subset.subset_state = RangeSubsetState(id, id, class_meas_data.id[STUDENT_ID_COMPONENT])
             color = student_slider.highlight_color if highlighted else student_slider.default_color
             self.student_slider_subset.style.color = color
         def student_slider_refresh(slider):
@@ -326,16 +361,16 @@ class StageFour(HubbleStage):
         student_slider.on_id_change(student_slider_change)
         student_slider.on_refresh(student_slider_refresh)
 
-        layer_viewer.toolbar.set_tool_enabled("hubble:linedraw", self.stage_state.marker_reached("tre_lin2c"))
+        layer_viewer.toolbar.set_tool_enabled("hubble:linedraw", self.stage_state.marker_reached("cla_dat1"))
         layer_viewer.toolbar.set_tool_enabled("hubble:linefit", self.stage_state.marker_reached("bes_fit1c"))
 
         # Create the class slider
-        class_slider_subset_label = "class_slider_subset"
-        self.class_slider_subset = all_data.new_subset(label=class_slider_subset_label)
+        self.class_slider_subset = all_data.new_subset(label=CLASS_SLIDER_SUBSET_LABEL)
+        self.class_slider_subset.style.markersize = 56
         class_slider = IDSlider(classes_summary_data, CLASS_ID_COMPONENT, AGE_COMPONENT, highlight_ids=[self.story_state.classroom["id"]], default_color = "#FF006E", highlight_color = "#3A86FF")
         self.add_component(class_slider, "py-class-slider")
         def class_slider_change(id, highlighted):
-            self.class_slider_subset.subset_state = all_data[CLASS_ID_COMPONENT] == id
+            self.class_slider_subset.subset_state = RangeSubsetState(id, id, all_data.id[CLASS_ID_COMPONENT])
             color = "#3A86FF" if highlighted else "#FF006E"
             self.class_slider_subset.style.color = color
         def class_slider_refresh(slider):
@@ -346,11 +381,75 @@ class StageFour(HubbleStage):
         class_slider.on_id_change(class_slider_change)
         class_slider.on_refresh(class_slider_refresh)
 
+        allclasses_percentage_subset_label = "allclasses_percentage_subset"
+        myclass_percentage_subset_label = "myclass_percentage_subset"
+        allstudents_percentage_subset_label = "allstudents_percentage_subset"
+        
+        mmm_text = {
+            'mean':"""The mean is the average of all values in the dataset. The 
+                      average is calculated by adding all the values together and dividing by the number of values.
+                      In this example, the mean of the distribution is 14.
+                      """, 
+            'median': """The median is the middle of the dataset. 
+                        Fifty percent of the data is above the median and fifty percent is less than or equal to the median.
+                        In this example, the median the distribution is 15
+                        """, 
+            'mode':"""The mode is the most commonly measured value or range 
+                        of values in a set of data and appears as the tallest bar in a histogram. 
+                        In this example, the mode of the distribution is 16.
+                        """
+            }
+        mmm_urls = {
+            'median': f"{self.stage_state.image_location}/median.png",  #'https://picsum.photos/900/600', #
+            'mean':   f"{self.stage_state.image_location}/mean.png",     #'https://picsum.photos/900/600', #
+            'mode':   f"{self.stage_state.image_location}/mode.png"      #'https://picsum.photos/900/600'  # 
+        }
+        
+        all_percentage_selector = PercentageSelector([self.viewers["all_distr_viewer_class"], self.viewers["all_distr_viewer_student"]],
+                                                 [classes_summary_data, students_summary_data],
+                                                 units=["Gyr"] * 2,
+                                                 resolution=0,
+                                                 subset_labels=[allclasses_percentage_subset_label, allstudents_percentage_subset_label])
+        self.add_component(all_percentage_selector, "py-all-percentage-selector")
+
+        all_statistics_selector = StatisticsSelector([all_distr_viewer_class, all_distr_viewer_student],
+                                                 [classes_summary_data, students_summary_data],
+                                                 units=["Gyr"] * 2,
+                                                 transform=round)
+        all_statistics_selector.help_text = mmm_text
+        all_statistics_selector.help_images = mmm_urls
+        self.add_component(all_statistics_selector, "py-all-statistics-selector")
+
+        myclass_percentage_selector = PercentageSelector([self.viewers["class_distr_viewer"]],
+                                                 [class_summ_data],
+                                                 units=["Gyr"],
+                                                 resolution=0,
+                                                 subset_labels=[myclass_percentage_subset_label])
+        self.add_component(myclass_percentage_selector, "py-myclass-percentage-selector")
+
+        myclass_statistics_selector = StatisticsSelector([class_distr_viewer],
+                                                 [class_summ_data],
+                                                 units=["Gyr"],
+                                                 transform=round)
+        myclass_statistics_selector.help_text = mmm_text
+        myclass_statistics_selector.help_images = mmm_urls
+        self.add_component(myclass_statistics_selector, "py-myclass-statistics-selector")
+        
+        
+        self.selectors = {
+            'all': [all_percentage_selector, all_statistics_selector, myclass_percentage_selector, myclass_statistics_selector],
+            'myclass': {'percentage': myclass_percentage_selector, 'statistics':myclass_statistics_selector},
+            'allclass': {'percentage': all_percentage_selector, 'statistics':all_statistics_selector}
+        }
+
         not_ignore = {
             fit_table.subset_label: [layer_viewer],
             histogram_source_label: [class_distr_viewer],
             histogram_modify_label: [comparison_viewer],
-            student_slider_subset_label: [comparison_viewer],
+            STUDENT_SLIDER_SUBSET_LABEL: [comparison_viewer],
+            allclasses_percentage_subset_label: [all_distr_viewer_class],
+            myclass_percentage_subset_label: [class_distr_viewer],
+            allstudents_percentage_subset_label: [all_distr_viewer_student],
             BEST_FIT_SUBSET_LABEL: [layer_viewer]
         }
 
@@ -465,7 +564,7 @@ class StageFour(HubbleStage):
             if not all_viewer.toolbar.tools["hubble:linefit"].active: # if off
                 all_viewer.toolbar.tools["hubble:linefit"].activate() # toggle on
                     
-        if advancing and new == "tre_lin2c":
+        if advancing and new == "cla_dat1":
             layer_viewer.toolbar.tools["hubble:linedraw"].erase_line() 
             layer_viewer.toolbar.set_tool_enabled("hubble:linedraw", True)
             student_data = self.get_data(STUDENT_DATA_LABEL)
@@ -494,13 +593,16 @@ class StageFour(HubbleStage):
         if advancing and new == 'two_his1':
             self.get_viewer("all_distr_viewer_student").state.reset_limits()
             self.match_student_class_hist_axes(True)
+            # reset the selectors going to a new view
+            for selector in self.selectors['all']:
+                selector.selected = None
+            
             
         if demo and old == 'two_his1':
             self.stage_state.marker = 'acc_unc1'
         
         if not advancing and self.stage_state.marker_before('two_his1'):
             self.match_student_class_hist_axes(False)
-            
 
     def match_student_class_hist_axes(self, match = True):        
         student_tool = self.get_viewer("all_distr_viewer_student").toolbar.tools['bqplot:home']
@@ -585,7 +687,7 @@ class StageFour(HubbleStage):
         all_layer = all_viewer.layer_artist_for_data(all_data)
         all_layer.state.zorder = 0
         all_layer.state.color = "#78909C"
-        all_layer.state.size = 2
+        all_layer.state.size = 7
         all_layer.state.visible = False
         all_viewer.state.x_att = all_data.id[DISTANCE_COMPONENT]
         all_viewer.state.y_att = all_data.id[VELOCITY_COMPONENT]
@@ -598,8 +700,7 @@ class StageFour(HubbleStage):
 
         # We want to turn this off here so that a it doesn't show up in previous stages
 
-        student_slider_subset_label = "student_slider_subset"
-        student_slider_subset_layer = [layer for layer in layer_viewer.layers if student_slider_subset_label in layer.layer.label]
+        student_slider_subset_layer = [layer for layer in layer_viewer.layers if STUDENT_SLIDER_SUBSET_LABEL in layer.layer.label]
         student_slider_subset_layer = next(student_slider_subset_layer.__iter__(), None) # get the first element or None if empty
         if student_slider_subset_layer is not None:
             student_slider_subset_layer.visible = False
@@ -621,13 +722,13 @@ class StageFour(HubbleStage):
             if viewer not in all_distr:
                 viewer.add_data(class_summ_data)
                 layer = viewer.layer_artist_for_data(class_summ_data)
-                layer.state.color = '#8338EC'
-                layer.state.alpha = 0.7 # purple from alt palette #1
+                layer.state.color = '#8338EC' # purple from alt palette #1
+                layer.state.alpha = 1
             if viewer != class_distr_viewer and viewer != all_distr_viewer_class:
                 viewer.add_data(students_summary_data)
                 layer = viewer.layer_artist_for_data(students_summary_data)
                 layer.state.color = '#FFBE0B' # yellow from alt palette #1
-                layer.state.alpha = 0.7
+                layer.state.alpha = 1
                 if viewer == all_distr_viewer_class:
                     layer.state.visible = False
                 viewer.state.hist_n_bin = 20
@@ -635,20 +736,42 @@ class StageFour(HubbleStage):
                 viewer.add_data(classes_summary_data)
                 layer = viewer.layer_artist_for_data(classes_summary_data)
                 layer.state.color = '#619EFF' # light blue from alt palette #1
-                layer.state.alpha = 0.7
+                layer.state.alpha = 1
                 if viewer == all_distr_viewer_student:
                     layer.state.visible = False
                 # viewer.state.normalize = True
                 # viewer.state.y_min = 0
                 # viewer.state.y_max = 1
-                viewer.state.hist_n_bin = 6
+                # viewer.state.hist_n_bin = 6
             viewer.figure.axes[1].label = label
             viewer.figure.axes[1].tick_format = '0'
             # viewer.figure.axes[1].num_ticks = 5
+            
+        
+            
 
         class_distr_viewer.state.x_att = class_summ_data.id[AGE_COMPONENT]
         all_distr_viewer_class.state.x_att = classes_summary_data.id[AGE_COMPONENT]
         all_distr_viewer_student.state.x_att = students_summary_data.id[AGE_COMPONENT]
+
+        
+        def _update_bins(*args):
+            for hist in histogram_viewers:
+                props = ('hist_n_bin', 'hist_x_min', 'hist_x_max')
+                with delay_callback(hist.state, *props):
+                    layer = hist.layers[0] # only works cuz there is only one layer 
+                    component = hist.state.x_att                   
+                    xmin = round(layer.layer.data[component].min(),0) - 0.5
+                    xmax = round(layer.layer.data[component].max(),0) + 0.5
+                    hist.state.hist_n_bin = int(xmax - xmin)
+                    hist.state.hist_x_min = xmin
+                    hist.state.hist_x_max = xmax
+        
+        _update_bins()
+        
+        self.hub.subscribe(self, NumericalDataChangedMessage,
+                           handler=_update_bins)
+
 
         theme = "dark" if self.app_state.dark_mode else "light"
         style_name = f"default_histogram_{theme}"
@@ -659,6 +782,10 @@ class StageFour(HubbleStage):
         class_distr_viewer.state.show_measuring_line()
         all_distr_viewer_student.state.show_measuring_line()
         all_distr_viewer_class.state.show_measuring_line()
+        
+        
+        for hist in histogram_viewers:
+            hist._label_text = lambda x: f"{round(x,0):.0f}"
         # class_distr_viewer.state.hide_measuring_line()
         # all_distr_viewer_student.state.hide_measuring_line()
         # all_distr_viewer_class.state.hide_measuring_line()
@@ -708,6 +835,7 @@ class StageFour(HubbleStage):
             self.stage_state.hypgal_distance = data[DISTANCE_COMPONENT][index]
             self.stage_state.our_age = (AGE_CONSTANT * self.stage_state.hypgal_distance/self.stage_state.hypgal_velocity)
 
+    # Can we remove this? This looks very old as it is referencing "stage_three" 
     def _update_image_location(self, using_voila):
         prepend = "voila/files/" if using_voila else ""
         self.stage_state.image_location = prepend + "data/images/stage_three"
@@ -764,12 +892,9 @@ class StageFour(HubbleStage):
                 class_slider.update_data(msg.data)
             self._reset_limits_for_data(label)
 
-    def _on_class_data_update(self, *args):
-        self.reset_viewer_limits()
+        if label == CLASS_DATA_LABEL:
+            self.stage_state.class_data_size = int(self.get_data(CLASS_DATA_LABEL).size / 5)
 
-    def _on_student_data_update(self, *args):
-        self.reset_viewer_limits()
-    
     def _on_dark_mode_change(self, dark):
         super()._on_dark_mode_change(dark)
         self._update_viewer_style(dark)

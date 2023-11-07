@@ -47,7 +47,6 @@
 
         <v-window
           v-model="step"
-          style="height: 70vh;"
           class="overflow-auto"
         >
         <v-row>
@@ -225,8 +224,14 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .no-transition {
   transition: none;
+}
+
+.row {
+  width: 100%;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 </style>
