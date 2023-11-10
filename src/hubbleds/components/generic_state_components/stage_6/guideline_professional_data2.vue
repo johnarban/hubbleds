@@ -28,7 +28,6 @@
             'Remember, the slope of the trend in our data is shallower than the trend in Hubble\'s data, so our age estimate must be higher.'
           ]"
           :correct-answers="[0]"
-          :neutral-answers='[1]'
           @select="(status) => { if (status.correct) { allowAdvancing(); } }"
           score-tag="pro-dat2"
         >

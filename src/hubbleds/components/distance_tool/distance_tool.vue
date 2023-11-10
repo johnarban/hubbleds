@@ -70,7 +70,7 @@
             bottom
             right
             absolute
-            :color="measuring ? 'red' : 'success'"
+            :color="measuring ? 'red' : '#00E676'"
             class="measuring-fab black--text"
             :ripple="false"
             v-bind="attrs"

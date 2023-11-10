@@ -80,6 +80,7 @@
             rows="1"
             label="New Most Likely Age"
             tag="new-most-likely-age"
+            type="float"
           ></free-response>
         </v-col>
         <v-col>
@@ -157,6 +158,7 @@
             rows="1"
             label="New Likely Low Age"
             tag="new-likely-low-age"
+            type="float"
           ></free-response>
         </v-col>
         <v-col
@@ -171,6 +173,7 @@
             rows="1"
             label="New Likely High Age"
             tag="new-likely-high-age"
+            type="float"
           ></free-response>
         </v-col>
         <v-col

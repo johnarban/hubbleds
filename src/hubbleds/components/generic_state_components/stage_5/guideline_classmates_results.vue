@@ -17,7 +17,7 @@
         Your value appears in orange-red, and your classmates' are blue.
       </p>
       <p>
-        To exclude outliers, click <v-btn icon tile dark x-small disabled class="mx-1" elevation="2" style="background-color: #0277BD; border-radius: 5px;"><v-icon style="color:white!important;">mdi-select-search</v-icon></v-btn> to zoom in to a smaller velocity or distance range.
+        Click <v-btn icon tile dark x-small disabled class="mx-1" elevation="2" style="background-color: #0277BD; border-radius: 5px;"><v-icon style="color:white!important;">mdi-select-search</v-icon></v-btn> to zoom in to a smaller velocity or distance range.
       </p>
     </div>
   </scaffold-alert>

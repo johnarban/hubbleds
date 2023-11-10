@@ -148,7 +148,6 @@
                       'That is an unexpected result. For each galaxy, compare the values for rest wavelength (column 3) and observed wavelength (column 4). Check with an instructor in case your measurements need adjustment.'
                     ]"
                     :correct-answers="[1]"
-                    :neutral-answers="[0,2,3]"
                     @select="(state) => { if(state.correct) { max_step_completed = Math.max(max_step_completed, 2); } }"
                     score-tag="wavelength-comparison"
                   >
@@ -294,7 +293,8 @@
                       'Interesting that they also got the same result as you. Does that give you more confidence in your conclusions?',
                       'Hmm. That is an unexpected result. It might be helpful to check in with your instructor.',
                       'No problem. Checking the Cosmic Data Stories database, everyone else who has completed this story also found that their galaxies are all moving away from us. Does that give you more confidence in your conclusions?']"
-                    :neutral-answers="[0,2]"
+                    :correct-answers="[0,2]"
+                    :neutral-answers="[1]"
                     @select="(state) => { if(state.correct || state.neutral) { max_step_completed = Math.max(max_step_completed, 6); } }" 
                     score-tag="peers-data-agree"
                   >

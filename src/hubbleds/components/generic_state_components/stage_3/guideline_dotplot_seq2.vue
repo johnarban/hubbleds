@@ -27,8 +27,7 @@
             'If the measurements cluster around a single common value, there is consensus. If they cluster around more than one value, there is not consensus.'
             ]" 
           :correct-answers="[1]"
-          :wrong-answers="[0]"
-          :neutral-answers="[2]"
+          :neutral-answers="[0, 2]"
           @select="(opt) => { if (opt.correct) { console.log('correct'); $emit('ready'); } }"
           score-tag="ange_meas_consensus">
             >

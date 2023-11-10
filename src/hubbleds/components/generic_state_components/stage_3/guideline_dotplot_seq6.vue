@@ -32,8 +32,7 @@
           'Consider which dot plot has measurements that cluster around fewer common values.'
           ]"
         :correct-answers="[1]"
-        :wrong-answers="[0]"
-        :neutral-answers="[2]"
+        :neutral-answers="[0, 2]"
         @select="(opt) => { if (opt.correct) { console.log('correct'); $emit('ready') } }"
         score-tag="ange_meas_consensus_2">
       </mc-radiogroup>

@@ -148,7 +148,7 @@
             bottom
             left
             absolute
-            color="success"
+            color="#00E676"
             class="selection-fab black--text"
             v-bind="attrs"
             v-on="on"
@@ -168,7 +168,7 @@
           bottom
           right
           absolute
-          color="success"
+          color="#00E676"
           class="selection-fab black--text"
           v-bind="attrs"
           v-on="on"

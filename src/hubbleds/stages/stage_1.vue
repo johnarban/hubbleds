@@ -1,39 +1,24 @@
 <template>
   <v-container>
-    <v-chip-group
-      active-class="primary"
-      column
-    >
-      <v-text-field
-          class="demo_v-text-field"
-          v-model="stage_state.marker"
-          rounded
-          outlined
-          dense
-          label="Marker"
-        />
-        
-      <v-chip
-        v-for="(marker, index) in stage_state.demo_markers"
-        dark
-        :color="stage_state.marker == marker['marker'] ? 'deep-purple darken-4' : 'blue-grey darken-3'"
-        text-color="blue-grey lighten-5"
-        :key="index"
-        @click="run_demo(marker)"
-      >
-        {{ marker['label'] }}
-      </v-chip>
-    </v-chip-group>
     <v-row v-if="show_team_interface">
       <v-col>
         <v-btn
-          color="error"
+          color="success"
           class="black--text"
           @click="fill_data();"
         >fill data points</v-btn>
-
         <v-btn
-          color="error"
+          color="success"
+          class="black--text"
+          @click="() => {
+            console.log('stage state:', stage_state);
+            console.log('story state:', story_state);
+          }"
+        >
+          console.log State
+        </v-btn>
+        <v-btn
+          color="success"
           class="black--text"
           @click="() => {
             print_state();
@@ -42,7 +27,7 @@
           Print Python State
         </v-btn>
         <v-btn
-          color="error"
+          color="success"
           class="black--text"
           @click="() => {
             fill_data();
@@ -89,7 +74,7 @@
         />
         <v-btn
           v-if="show_team_interface && (stage_state.marker === 'sel_gal2' || 'sel_gal3 || sel_gal4' && stage_state.gals_total < stage_state.gals_max)"
-          color="error"
+          color="success"
           class="black--text"
           block
           max-width="800"
@@ -459,7 +444,7 @@
           <v-col
             v-if="show_team_interface">
             <v-btn
-              color="error"
+              color="success"
               class="black--text"
               @click="update_velocities()"
             >
@@ -475,14 +460,7 @@
 
 
 <style>
-.demo_v-text-field {
-  flex: none;
-  margin: auto 10px;
-}
-.demo_v-text-field div.v-input__slot {
-  width: 15ch;
-  font-size: 10pt;
-}
+
 .v-dialog .v-card__text {
   font-size: 18px !important;
 }

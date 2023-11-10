@@ -23,7 +23,7 @@
       >
         <mc-radiogroup
           :radio-options="[
-              'Scientists can\'t really know what the age of the universe is.',
+              'Scientists do not really know how to measure the age of the universe.',
               'Scientists measure different ages because the universe is always getting older.',
               'The measured age of the universe can change based on new and better data.'
           ]"

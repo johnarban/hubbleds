@@ -84,6 +84,7 @@
             rows="1"
             label="Most Likely Age"
             tag="best-guess-age"
+            type="float"
           ></free-response>
         </v-col>
         <v-col>

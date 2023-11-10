@@ -14,7 +14,7 @@
     <div
       class="mb-4"
     >
-      Now try comparing the 50%, 68%, and 95% confidence ranges between the two histograms. (The switches will display the same percentage range on both histograms.)
+      Now try comparing the inner 50%, 68%, and 95% confidence ranges between the two histograms. (The switches will display the same percentage range on both histograms.)
       <v-container
         class="px-0"
         fluid

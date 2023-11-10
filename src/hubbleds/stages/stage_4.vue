@@ -33,7 +33,7 @@
     <v-row v-if="show_team_interface">
       <v-col>
         <v-btn
-          color="error"
+          color="success"
           class="black--text"
           @click="() => {
             console.log('stage state:', stage_state);
@@ -43,7 +43,7 @@
           State
         </v-btn>
         <v-btn
-          color="error"
+          color="success"
           class="black--text"
           @click="() => {
             stage_state.marker = 'age_dis1';

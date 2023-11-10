@@ -29,22 +29,24 @@
         tag="prodata-reflect-8a"
       ></free-response>
       
-      <p>What age of the universe can be obtained from Edwin Hubble's data?</p>
+      <p>What age of the universe can be obtained from Edwin Hubble's data (in Gyr)?</p>
       <free-response
         outlined
         auto-grow
         rows="2"
         label="Age from Edwin Hubble"
         tag="prodata-reflect-8b"
+        type="float"
       ></free-response>
       
-    <p>What age of the universe can be obtained from the HST Key project's data?</p>
+    <p>What age of the universe can be obtained from the HST Key project's data (in Gyr)?</p>
       <free-response
         outlined
         auto-grow
         rows="2"
         label="Age from HST Key Project"
         tag="prodata-reflect-8c"
+        type="float"
       ></free-response>
       </v-container>
     </div>

@@ -25,7 +25,7 @@
             'Consider only the range of values that excludes outliers. If measurements are clustered around a single velocity value, there is consensus. If they are clustered around multiple values, there is not consensus.'
             ]" 
           :correct-answers="[1]"
-          :neutral-answers="[2]"
+          :neutral-answers="[0, 2]"
           @select="(opt) => { if (opt.correct) { console.log('correct'); $emit('ready'); } }"
           score-tag="vel_meas_consensus">
             >

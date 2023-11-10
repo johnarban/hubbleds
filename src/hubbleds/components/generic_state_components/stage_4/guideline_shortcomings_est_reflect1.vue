@@ -35,6 +35,7 @@
         label="Other Shortcomings"
         hint="(if you can think of any more)"
         tag="other-shortcomings"
+        allow-empty="true"
       ></free-response>
     </div>
   </scaffold-alert>

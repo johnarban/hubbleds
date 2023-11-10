@@ -348,6 +348,7 @@
                   class="mx-a"
                   contain
                   max-height="300"
+                  aspect-ratio="2.6288"
                   :src="`${image_location}/cosmicgraphic.png`"
                 ></v-img>
               </v-col>
@@ -812,7 +813,7 @@
       <!-- first button below just being used for testing, delete when using live with students -->
       <v-btn
         v-if="step < 12 && show_team_interface"
-        color="error"
+        color="success"
         class="black--text"
         depressed
         @click="() => {

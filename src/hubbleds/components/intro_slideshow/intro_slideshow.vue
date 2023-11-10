@@ -825,7 +825,7 @@
       <!-- first button below just being used for testing, delete when using live with students -->
       <v-btn
         v-if="step < 6 && show_team_interface"
-        color="error"
+        color="success"
         class="black--text"
         depressed
         @click="() => {

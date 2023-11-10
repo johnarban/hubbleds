@@ -14,7 +14,7 @@
       class="mb-4"
     >
       <p>
-        Another data set to explore are the age values measured by All Students who have completed this Data Story. 
+        The top graph shows the age values measured by All Students who have completed this Data Story. 
       </p>
       <p>
         Notice how the All Students histogram (top) differs from the All Classes histogram (bottom).

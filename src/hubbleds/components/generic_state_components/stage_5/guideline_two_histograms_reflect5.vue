@@ -9,7 +9,7 @@
       class="mb-4"
     >
       <p>
-        The broader confidence intervals for the All Students data tell us that an age value measured by one student has more uncertainty than an age value measured by a single class.
+        The smoother, less clustered distribution for the All Students data tells us that an age value measured by one student has more uncertainty than an age value measured by a single class.
       </p>
       <p>
         Explain why you think this might be true.

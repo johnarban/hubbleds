@@ -92,6 +92,7 @@
             rows="1"
             label="Likely Low Age"
             tag="likely-low-age"
+            type="float"
           ></free-response>
         </v-col>
         <v-col
@@ -106,6 +107,7 @@
             rows="1"
             label="Likely High Age"
             tag="likely-high-age"
+            type="float"
           ></free-response>
         </v-col>
         <v-col

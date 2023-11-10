@@ -17,11 +17,11 @@
     <div
       class="mb-4"
     >
-      <p>
+    <p>
         Click on one edge of your galaxy to mark the ruler's starting point.
       </p>
       <p>
-        With the button held down, drag to the other edge of your galaxy and release the button.
+        Move the cursor to the other edge of your galaxy and click again.
       </p>
       <p>
         If you want to adjust your measurement, you can click on the ends of the green line and move them to a new location.
