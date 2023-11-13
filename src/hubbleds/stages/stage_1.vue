@@ -1,5 +1,39 @@
 <template>
   <v-container>
+    <v-chip-group
+      active-class="primary"
+      column
+    >
+      <v-text-field
+          class="demo_v-text-field"
+          v-model="stage_state.marker"
+          rounded
+          outlined
+          dense
+          label="Marker"
+        />
+        
+        <!-- v-select with all the markers -->
+        <v-select
+          class="demo_v-select"
+          v-model="stage_state.marker"
+          :items="stage_state.markers"
+          label="Marker"
+          outlined
+          dense
+        />
+        
+      <v-chip
+        v-for="(marker, index) in stage_state.demo_markers"
+        dark
+        :color="stage_state.marker == marker['marker'] ? 'deep-purple darken-4' : 'blue-grey darken-3'"
+        text-color="blue-grey lighten-5"
+        :key="index"
+        @click="run_demo(marker)"
+      >
+        {{ marker['label'] }}
+      </v-chip>
+    </v-chip-group>
     <v-row v-if="show_team_interface">
       <v-col>
         <v-btn
@@ -460,6 +494,16 @@
 
 
 <style>
+
+.demo_v-text-field {
+  flex: none;
+  margin: auto 10px;
+}
+.demo_v-text-field div.v-input__slot {
+  width: 15ch;
+  font-size: 10pt;
+}
+
 
 .v-dialog .v-card__text {
   font-size: 18px !important;
