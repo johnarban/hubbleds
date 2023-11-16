@@ -35,7 +35,7 @@ class StageState(CDSState):
 
     max_prodata_index = CallbackProperty(0)
     
-    markers = [
+    markers = ListCallbackProperty([
         'pro_dat0',
         'pro_dat1',
         'pro_dat2',
@@ -49,7 +49,7 @@ class StageState(CDSState):
         'sto_fin1',
         'sto_fin2',
         'sto_fin3'
-        ]
+        ])
     
     demo_markers = ListCallbackProperty([
         'pro_dat0',
