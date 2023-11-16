@@ -610,8 +610,6 @@ class StageFour(HubbleStage):
                 selector.selected = None
             
             
-        if demo and old == 'two_his1':
-            self.stage_state.marker = 'acc_unc1'
         
         if not advancing and self.stage_state.marker_before('two_his1'):
             self.match_student_class_hist_axes(False)

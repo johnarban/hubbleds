@@ -181,6 +181,7 @@ class StageState(CDSState):
         'cho_row1',
         'mee_spe1',
         'dop_cal0',
+        'dot_seq2',
         'dot_seq4',
         'dot_seq5',
         'dot_seq10',
