@@ -114,7 +114,7 @@ class StageState(CDSState):
         'fil_rem1',
     ])
     
-    demo_markers = ListCallbackProperty(['est_dis4','ang_siz5a', 'dot_seq5','rep_rem1','fil_rem1'])
+    demo_markers = ListCallbackProperty(['cho_row1','est_dis3','ang_siz5a', 'dot_seq3', 'dot_seq5','rep_rem1','fil_rem1'])
     
     step_markers = ListCallbackProperty([])
 
@@ -250,7 +250,7 @@ class StageTwo(HubbleStage):
         if self.stage_state.marker in ['fil_rem1']: 
             self.stage_state.marker_backward = 1
             
-        self.prep_demo()
+        
         
         dosdonts_slideshow = DosDontsSlideShow(self.stage_state.image_location_dosdonts)
         self.add_component(dosdonts_slideshow, label='py-dosdonts-slideshow')
@@ -428,6 +428,7 @@ class StageTwo(HubbleStage):
             self.stage_state.show_dotplot2 = True
         
        #print('at end of init', self.stage_state.marker)
+        self.prep_demo()
 
     def setup_dotplot_viewers(self):
         
@@ -948,6 +949,7 @@ class StageTwo(HubbleStage):
 
     def prep_demo(self):
         self.stage_state.dos_donts_opened = True
+        self.stage_state.marker = self.stage_state.markers[0]
         
 
         

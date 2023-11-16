@@ -50,6 +50,12 @@ class StageState(CDSState):
         'sto_fin2',
         'sto_fin3'
         ]
+    
+    demo_markers = ListCallbackProperty([
+        'pro_dat0',
+        'pro_dat9',
+        'sto_fin3'
+        ])
         
     step_markers = ListCallbackProperty([])
 
@@ -62,6 +68,7 @@ class StageState(CDSState):
         'markers', 'indices', #'step_markers', 
         'image_location',
         'marker_forward', 'marker_backward',
+        'demo_markers'
     ]
     
     def __init__(self, *args, **kwargs):

@@ -26,12 +26,12 @@
       <v-chip
         v-for="(marker, index) in stage_state.demo_markers"
         dark
-        :color="stage_state.marker == marker['marker'] ? 'deep-purple darken-4' : 'blue-grey darken-3'"
+        :color="stage_state.marker == marker ? 'deep-purple darken-4' : 'blue-grey darken-3'"
         text-color="blue-grey lighten-5"
         :key="index"
-        @click="run_demo(marker)"
+        @click="stage_state.marker = marker"
       >
-        {{ marker['label'] }}
+        {{ marker }}
       </v-chip>
     </v-chip-group>
     <v-row v-if="show_team_interface">

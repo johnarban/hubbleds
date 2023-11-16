@@ -20,6 +20,15 @@
             console.log('story state:', story_state);
           }"
         />
+        <!-- v-select with all the markers -->
+        <v-select
+          class="demo_v-select"
+          v-model="stage_state.marker"
+          :items="stage_state.markers"
+          label="Marker"
+          outlined
+          dense
+        />
           <v-chip
             v-for="(marker, index) in stage_state.markers"
             dark

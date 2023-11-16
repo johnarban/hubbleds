@@ -176,8 +176,7 @@ class StageThree(HubbleStage):
         self.show_team_interface = self.app_state.show_team_interface
         self._setup_complete = False
         
-        if demo:
-            self.prep_demo()
+        
         # This is a hacky fix because these are not initializing correctly on a reload, so we are backing them up 1 or 2 guidelines, and when they go forward again they will be correct.
         if self.stage_state.marker in ['tre_lin2', 'bes_fit1']:
             self.stage_state.marker = 'tre_lin1'
@@ -294,6 +293,9 @@ class StageThree(HubbleStage):
             add_callback(self.story_state, 'stage_index', self._on_stage_index_changed)
         else:
             self._deferred_setup()
+        
+        if demo:
+            self.prep_demo()
     
     def _on_marker_update(self, old, new):
         if not self.trigger_marker_update_cb:
@@ -509,8 +511,9 @@ class StageThree(HubbleStage):
 
     
     def prep_demo(self):
-        self.stage_state.trend_line_drawn = True
-        self.stage_state.best_fit_clicked = True
+        # self.stage_state.trend_line_drawn = True
+        # self.stage_state.best_fit_clicked = True
+        self.stage_state.marker = self.stage_state.markers[0]
         
             
 

@@ -141,7 +141,7 @@ class StageState(CDSState):
         
     ])
     
-    demo_markers = ListCallbackProperty(['cla_res1','age_dis1', 'con_int1', 'cla_res1c','two_his1', 'acc_unc1'])
+    demo_markers = ListCallbackProperty(['cla_res1','age_dis1', 'con_int1', 'cla_res1c','two_his1', 'mor_dat1'])
 
     step_markers = ListCallbackProperty([])
 
@@ -262,9 +262,7 @@ class StageFour(HubbleStage):
 
         add_callback(self.story_state, 'responses', self.age_calc_update_guesses)
 
-        if demo and self.stage_state.marker == 'ran_var1':
-            self.stage_state.marker = 'cla_res1'
-            self.prep_demo()
+       
         
         self.show_team_interface = self.app_state.show_team_interface
 
@@ -543,6 +541,10 @@ class StageFour(HubbleStage):
         
         if self.stage_state.marker == 'age_dis1c':
             all_distr_viewer_class.state.reset_limits()
+        
+        if demo and self.stage_state.marker == 'ran_var1':
+            self.stage_state.marker = 'cla_res1'
+            self.prep_demo()
             
     def _on_marker_update(self, old, new):
         if not self.trigger_marker_update_cb:
@@ -943,5 +945,6 @@ class StageFour(HubbleStage):
                 class_layer.state.visible = False
 
     def prep_demo(self):
-        self.stage_state.class_trend_line_drawn = True
-        self.stage_state.class_best_fit_clicked = True
+        # self.stage_state.class_trend_line_drawn = True
+        # self.stage_state.class_best_fit_clicked = True
+        self.stage_state.marker = self.stage_state.markers[0]

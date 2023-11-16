@@ -43,6 +43,7 @@ def print_function_name(func):
         return func(*args, **kwargs)
     return wrapper
 
+demo = True
 class StageState(CDSState):
     gals_total = CallbackProperty(0)
     gals_max = CallbackProperty(5)
@@ -173,6 +174,20 @@ class StageState(CDSState):
         'ref_vel1',
         'end_sta1'
     ])
+    
+    demo_markers = ListCallbackProperty([
+        'mee_gui1',
+        'sel_gal3',
+        'cho_row1',
+        'mee_spe1',
+        'dop_cal0',
+        'dot_seq4',
+        'dot_seq5',
+        'dot_seq10',
+        'dot_seq12',
+        'ref_dat1',
+        'dop_cal0',
+    ])
 
     step_markers = ListCallbackProperty([])
 
@@ -218,7 +233,8 @@ class StageState(CDSState):
         # 'gals_total', 'obswaves_total',
         'velocities_total', 'image_location',
         'velocity_tolerance', 'has_bad_velocities',
-        'bad_velocity_index', 'has_multiple_bad_velocities'
+        'bad_velocity_index', 'has_multiple_bad_velocities',
+        'demo_markers'
     ]
 
     def __init__(self, *args, **kwargs):
@@ -292,7 +308,7 @@ class StageOne(HubbleStage):
         super().__init__(*args, **kwargs)
 
         self.show_team_interface = self.app_state.show_team_interface
-
+        
         # This flag indicates whether we're using one of the convenience "fill" methods
         # In which case we don't need to do all of the UI manipulation in quite the same way
         self._filling_data = False
@@ -304,7 +320,7 @@ class StageOne(HubbleStage):
             filter=lambda msg: ((msg.data.label == STUDENT_MEASUREMENTS_LABEL) | (msg.data.label == EXAMPLE_GALAXY_MEASUREMENTS)),
             handler=self._on_measurements_changed)
         
-
+        
         # Set up viewers
         spectrum_viewer = self.add_viewer(
             SpectrumView, label="spectrum_viewer")
@@ -442,7 +458,7 @@ class StageOne(HubbleStage):
         sdss_data = self.get_data(SDSS_DATA_LABEL)
         selected = self.get_data(STUDENT_MEASUREMENTS_LABEL).to_dataframe()
         selection_tool = SelectionTool(data=sdss_data,
-                                       selected_data=selected,
+                                    #    selected_data=selected,
                                        show_galaxies=self.stage_state.marker_reached("sel_gal1"))
         self.add_component(selection_tool, label='py-selection-tool')
         selection_tool.on_galaxy_selected = self._on_galaxy_selected
@@ -534,13 +550,13 @@ class StageOne(HubbleStage):
 
         # INITIALIZE STATE VARIABLES WHEN LOADING A STORED STATE
         # reset the state variables when we load a story state
-        self.stage_state.spec_tutorial_opened = self.stage_state.marker_reached(
+        self.stage_state.spec_tutorial_opened = demo or self.stage_state.marker_reached(
             'spe_tut1')
-        self.stage_state.spec_viewer_reached = self.stage_state.marker_reached(
+        self.stage_state.spec_viewer_reached = demo or self.stage_state.marker_reached(
             'cho_row1')
-        self.stage_state.doppler_calc_reached = self.stage_state.marker_reached(
+        self.stage_state.doppler_calc_reached = demo or self.stage_state.marker_reached(
             'dop_cal2')
-        self.stage_state.dotplot_tutorial_finished = self.stage_state.marker_reached(
+        self.stage_state.dotplot_tutorial_finished = demo or self.stage_state.marker_reached(
             'dot_seq1')
 
         # Initialize viewers to provide story state
@@ -584,6 +600,8 @@ class StageOne(HubbleStage):
         # Uncomment this to pre-fill galaxy data for convenience when testing later stages
         # self.vue_fill_data()
         # self.vue_select_galaxies()
+        if demo:
+            self.prep_demo()
     
     #@print_function_name
     def _on_measurements_changed(self, msg):
@@ -613,12 +631,33 @@ class StageOne(HubbleStage):
         if not self.trigger_marker_update_cb:
             return
         markers = self.stage_state.markers
+        
+        if demo and (new not in markers):
+            return
+        if demo and (old not in markers):
+            old = markers[markers.index(new) - 1]
+        
+        
         advancing = markers.index(new) > markers.index(old)
         print_log(f"Marker changed from {old} to {new} and is {'not ' if not advancing else ''}advancing")
         # if new in self.stage_state.step_markers and advancing:
         #     self.story_state.step_complete = True
         #     self.story_state.step_index = self.stage_state.step_markers.index(
         #         new)
+        if demo and self.stage_state.marker_reached('cho_row1'):
+            spectrum_viewer = self.get_viewer("spectrum_viewer")
+            spectrum_viewer.add_event_callback(spectrum_viewer._on_mouse_moved,
+                                               events=['mousemove'])
+            spectrum_viewer.add_event_callback(spectrum_viewer._on_click,
+                                               events=['click'])
+            spectrum_viewer.add_event_callback(self.on_spectrum_click,
+                                               events=['click'])
+            spectrum_viewer.add_event_callback(self.on_spectrum_click_example_galaxy,
+                                               events=['click'])
+            spectrum_viewer.toolbar.set_tool_enabled("hubble:restwave", True)
+            spectrum_viewer.toolbar.set_tool_enabled("hubble:wavezoom", True)
+            spectrum_viewer.toolbar.set_tool_enabled("bqplot:home", True)
+        
         if advancing and new == "dop_cal6":
             self.stage_state.doppler_calc_complete = True
             
@@ -1168,3 +1207,95 @@ class StageOne(HubbleStage):
 
     def vue_fill_table(self, _args):
         self.fill_table(self.example_galaxy_table)
+    
+    
+    def prep_demo(self):
+        # self.stage_state.doppler_calc_complete = True
+        # self.stage_state.spec_viewer_reached = True
+        # self.stage_state.doppler_calc_reached = True
+        # self.stage_state.lambda_used = True
+        # self.stage_state.lambda_on = True
+        # self.stage_state.zoom_tool_activated = True
+        # self.stage_state.dotplot_tutorial_finished = True
+        self.stage_state.marker = self.stage_state.markers[0]
+        spectrum_viewer = self.get_viewer("spectrum_viewer")
+        spectrum_viewer.add_event_callback(spectrum_viewer._on_mouse_moved,
+                                            events=['mousemove'])
+        spectrum_viewer.add_event_callback(spectrum_viewer._on_click,
+                                            events=['click'])
+        spectrum_viewer.add_event_callback(self.on_spectrum_click,
+                                            events=['click'])
+        spectrum_viewer.add_event_callback(self.on_spectrum_click_example_galaxy,
+                                            events=['click'])
+        spectrum_viewer.toolbar.set_tool_enabled("hubble:restwave", True)
+        spectrum_viewer.toolbar.set_tool_enabled("hubble:wavezoom", True)
+        spectrum_viewer.toolbar.set_tool_enabled("bqplot:home", True)
+        #  gals_total = CallbackProperty(0)
+        # gals_max = CallbackProperty(5)
+        # gal_selected = CallbackProperty(False)
+        # spec_viewer_reached = CallbackProperty(False)
+        # spec_tutorial_opened = CallbackProperty(False)
+        # dotplot_tutorial_finished = CallbackProperty(False) 
+        # dot_zoom_activated = CallbackProperty(True) # Need to initialize as false later
+        # dot_zoomed = CallbackProperty(True) # Need to initialize as false later
+        # dot_seq8_q = CallbackProperty(False)
+        # ref_vel1_q = CallbackProperty(False)
+        # lambda_used = CallbackProperty(False)
+        # lambda_on = CallbackProperty(False)
+        # waveline_set = CallbackProperty(False)
+        # obswaves_total = CallbackProperty(0)
+        # velocities_total = CallbackProperty(0)
+        # zoom_tool_activated = CallbackProperty(False)
+        # stage_1_complete = CallbackProperty(False)
+        # show_meas_tutorial = CallbackProperty(False)
+    
+        
+    
+    def advance_stage(self, markers, *args, catch_up = False):
+    
+        state = self.stage_state
+        
+        stage_markers = state.markers
+        
+        
+        # start at beginning
+        if markers is None:
+            state.marker = stage_markers[0]
+        
+        # go straight to the end (usually bad)
+        
+        # run through the rest of the markers
+        if markers == 'all':
+            index = stage_markers.index(state.marker)
+            for marker in stage_markers[index:]:
+                print(marker)
+                state.marker = marker
+            return
+        
+        if markers == 'last':
+            markers = stage_markers[-1]
+        
+        if catch_up:
+            start = stage_markers.index(state.marker)
+            end = stage_markers.index(markers)
+            for m in stage_markers[start:end+1]:
+                state.marker = m
+                
+        
+        # run over list of markers
+        if not isinstance(markers, list):
+            markers = [markers]
+
+        for arg in args:
+            markers.append(arg)
+        
+
+        for marker in markers:
+            state.marker = marker
+
+        
+    def vue_advance_stage(self, _data):
+        self.advance_marker(_data['marker'], _data.get('catch_up', False))
+    
+    def vue_catchup_stage(self, *args):
+        self.advance_stage(*args, catch_up=True)
