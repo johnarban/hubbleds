@@ -169,6 +169,8 @@ class StageFive(HubbleStage):
         add_callback(self.story_state, 'stage_index', self._on_stage_index_changed)
         if self.story_state.stage_index == self.index:
             self.deferred_setup()
+            
+        self.prep_demo()
         
 
     def _on_stage_index_changed(self, index):
@@ -370,3 +372,6 @@ class StageFive(HubbleStage):
         if (indices[0].size > 0):
             slope = self.linear_slope(dist[indices], vel[indices])
             self.stage_state.class_age = round(AGE_CONSTANT / slope, 2)
+
+    def prep_demo(self):
+        self.stage_state.marker = self.stage_state.markers[0]
