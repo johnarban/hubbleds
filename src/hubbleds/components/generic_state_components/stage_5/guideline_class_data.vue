@@ -16,7 +16,7 @@
         Now that you've drawn what conclusions you can from individual students' age measurements, let's turn back to your whole class's dataset, graphed here.
       </p>
       <p>
-        The same way you and your classmates estimated a single age for the universe using your 5 galaxies, you can fit a line to your whole class's dataset and estimate a new age using the {{ 5 * state.class_data_size }} galaxies you have measured all together.
+        The same way you and your classmates each estimated an age for the universe using your 5 galaxies, you can fit a line to your whole class's dataset and estimate a new age using the {{ 5 * state.class_data_size }} galaxies you have measured all together.
       </p>  
     </div>
   </scaffold-alert>

@@ -134,6 +134,8 @@ class StageFive(HubbleStage):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.show_team_interface = self.app_state.show_team_interface
+
+        self._setup_complete = False
         
         # self.stage_state.marker = self.stage_state.markers[0]
         
@@ -156,6 +158,20 @@ class StageFive(HubbleStage):
         layer_toggle.add_ignore_condition(self.ignore_slider_layer)
         self.add_component(layer_toggle, label="py-layer-toggle")    
         
+        # If possible, we defer some of the setup for later, to make loading faster
+        add_callback(self.story_state, 'stage_index', self._on_stage_index_changed)
+        if self.story_state.stage_index == self.index:
+            self.deferred_setup()
+        
+
+    def _on_stage_index_changed(self, index):
+        if index >= self.index:
+            self.deferred_setup()
+    
+    def deferred_setup(self):
+        if self._setup_complete:
+            return
+
         self.setup_prodata_viewer()
         
         self._update_viewer_style(dark=self.app_state.dark_mode)
@@ -173,6 +189,7 @@ class StageFive(HubbleStage):
         if self.stage_state.marker_reached('pro_dat1'):
                 self.set_class_age()
 
+        self._setup_complete = True
         
     def setup_prodata_viewer(self):
         # load the prodata_viewer

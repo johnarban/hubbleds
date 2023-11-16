@@ -557,7 +557,7 @@ class StageOne(HubbleStage):
         if self.stage_state.marker_reached("res_wav1"):
             spectrum_viewer.toolbar.set_tool_enabled("hubble:restwave", True)
 
-        if self.stage_state.marker_reached("obs_wav1"):
+        if self.stage_state.marker_reached("obs_wav1") and self.story_state.max_stage_index < 4:
             spectrum_viewer.add_event_callback(spectrum_viewer._on_mouse_moved,
                                                events=['mousemove'])
             spectrum_viewer.add_event_callback(spectrum_viewer._on_click,
@@ -655,7 +655,7 @@ class StageOne(HubbleStage):
             spectrum_viewer = self.get_viewer("spectrum_viewer")
             spectrum_viewer.toolbar.set_tool_enabled("hubble:restwave", True)
             
-        if advancing and new == "obs_wav1":
+        if advancing and new == "obs_wav1" and self.story_state.max_stage_index < 4:
             spectrum_viewer = self.get_viewer("spectrum_viewer")
             spectrum_viewer.add_event_callback(spectrum_viewer._on_mouse_moved,
                                                events=['mousemove'])

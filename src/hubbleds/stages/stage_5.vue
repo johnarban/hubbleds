@@ -80,6 +80,10 @@
           v-if="stage_state.marker == 'ran_var1'"
           :state="stage_state"
           v-intersect.once="scrollIntoView" />
+        <guideline-finished-classmates
+          v-if="stage_state.marker == 'fin_cla1'"
+          :state="stage_state"
+          v-intersect.once="scrollIntoView" />
         <guideline-class-data
           v-if="stage_state.marker == 'cla_dat1'"
           :state="stage_state"
@@ -126,7 +130,7 @@
 
     <v-row
       class="d-flex align-stretch"
-      v-if="stage_state.indices[stage_state.marker] > stage_state.indices['ran_var1'] && stage_state.indices[stage_state.marker] < stage_state.indices['cla_dat1']"
+      v-if="stage_state.indices[stage_state.marker] > stage_state.indices['fin_cla1'] && stage_state.indices[stage_state.marker] < stage_state.indices['cla_dat1']"
     > 
       <v-col
         cols="12"

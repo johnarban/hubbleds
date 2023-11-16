@@ -101,6 +101,7 @@ class StageState(CDSState):
 
     markers = CallbackProperty([
         'ran_var1',
+        'fin_cla1',
         'cla_res1',
         'rel_age1',
         'cla_age1',
