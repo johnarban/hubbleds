@@ -726,6 +726,7 @@ class StageTwo(HubbleStage):
             change = {'new':galaxy, 'old': None, 'owner': table}
             self.distance_table_selected_change(change)
             self.stage_state.bad_angsize_index = index
+            return
 
         data = table.glue_data
         curr_value = data[ANGULAR_SIZE_COMPONENT][index]

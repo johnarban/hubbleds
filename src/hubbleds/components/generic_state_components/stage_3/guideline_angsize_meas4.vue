@@ -11,7 +11,13 @@
     :state="state"
   >
     <template #before-next>
-      Measure angular size of galaxy
+      <span v-if="!state.bad_angsize">
+        Measure angular size of galaxy
+      </span>
+      <span v-if="state.bad_angsize">
+        <strong>Remeasure angular size</strong>
+        <br/>
+      </span>
     </template>
 
     <div

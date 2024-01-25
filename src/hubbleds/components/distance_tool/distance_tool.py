@@ -101,7 +101,8 @@ class DistanceTool(v.VueTemplate):
         # if valid:
         #     print('valid measurement')
         self.angular_size = ang_size
-        self.measurement_count += 1
+        if valid:
+            self.measurement_count += 1
 
     @observe('measuring')
     def _on_measuring_changed(self, measuring):
@@ -171,6 +172,7 @@ class DistanceTool(v.VueTemplate):
         c2 = (angular_size >= self.galaxy_min_size) 
         c3 = (angular_size <= self.galaxy_max_size)
         self.bad_measurement = not (c1 and c2 and c3)
+        print('bad measurement', self.bad_measurement)
         return c1 and c2 and c3
     
     
