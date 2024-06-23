@@ -8,7 +8,7 @@ from hubbleds.viewers.hubble_dotplot import HubbleDotPlotView, HubbleDotPlotView
 
 
 @solara.component
-def DotplotViewer(gjapp, viewer: HubbleDotPlotViewer | None = None, data=None, component_id=None, title = None, height=400, on_click_callback = None):
+def DotplotViewer(gjapp, data=None, component_id=None, title = None, height=400, on_click_callback = None):
     
     vertical_line_visible = solara.use_reactive(True)
     
@@ -29,12 +29,11 @@ def DotplotViewer(gjapp, viewer: HubbleDotPlotViewer | None = None, data=None, c
             else: 
                 viewer_data = data
             
-            if viewer is None:
-                dotplot_view: HubbleDotPlotViewer = gjapp.new_data_viewer(
-                    HubbleDotPlotView, data=viewer_data, show=False
-                )
-            else:
-                dotplot_view = viewer
+
+            dotplot_view: HubbleDotPlotViewer = gjapp.new_data_viewer(
+                HubbleDotPlotView, data=viewer_data, show=False
+            )
+
             
             # def on_click(**kwargs):
             #     fig = dotplot_view.figure
