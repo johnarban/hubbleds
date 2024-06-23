@@ -4,7 +4,6 @@ from cosmicds.components import ScaffoldAlert, StateEditor, MathJaxSupport, Plot
 import astropy.units as u
 from cosmicds import load_custom_vue_components
 from glue_jupyter.app import JupyterApplication
-from glue_jupyter.table import TableViewer
 from reacton import component, ipyvuetify as rv
 from pathlib import Path
 
@@ -31,6 +30,7 @@ from glue.core import Data
 from typing import List, Optional, cast
 
 component_state = ComponentState()
+
 
 def _update_angular_size(data, galaxy, angular_size, count):
     if bool(galaxy) and angular_size is not None:
@@ -144,18 +144,18 @@ def Page():
     StateEditor(Marker, component_state) 
     # This will print the tables 
     # need to > from pandas import DataFrame
-    def meas_to_df(meas):
-        try:
-            meas = meas.model_dump()
-        except AttributeError:
-            pass
-        try:
-            gal = meas.pop('galaxy')
-        except:
-            gal = {}
-        # gal = gal.model_dump(exclude={'spectrum'})
-        gal = {k:v for k,v in gal.items() if k != 'spectrum'}
-        return {**gal, **meas}
+    # def meas_to_df(meas):
+    #     try:
+    #         meas = meas.model_dump()
+    #     except AttributeError:
+    #         pass
+    #     try:
+    #         gal = meas.pop('galaxy')
+    #     except:
+    #         gal = {}
+    #     # gal = gal.model_dump(exclude={'spectrum'})
+    #     gal = {k:v for k,v in gal.items() if k != 'spectrum'}
+    #     return {**gal, **meas}
     
     # solara.HTML(unsafe_innerHTML=DataFrame([meas_to_df(s) for s in student_data.measurements or []]).to_html())
     # solara.HTML(unsafe_innerHTML=DataFrame([meas_to_df(s) for s in example_data.measurements or []]).to_html())
@@ -172,6 +172,7 @@ def Page():
         #     component_state.transition_to(Marker.sel_gal3, force=True)
 
         # solara.Button("Select 5 Galaxies", on_click=_on_select_galaxies_clicked)
+
 
     with solara.ColumnsResponsive(12, large=[4,8]):
         with rv.Col():
@@ -315,9 +316,6 @@ def Page():
 
     with solara.ColumnsResponsive(12, large=[4,8]):
         with rv.Col():
-            
-            
-            
             ScaffoldAlert(
                 # TODO This will need to be wired up once table is implemented
                 GUIDELINE_ROOT / "GuidelineChooseRow1.vue",
@@ -571,8 +569,27 @@ def Page():
                 
                 # if component_state.current_step_at_or_after(Marker.dot_seq5):
                 solara.Button("Add Example Data", on_click=add_student_measurement)
-            solara.Markdown("blah blah")
-
+                
+                def on_click(trace, points, selector):
+                    # print(*args, **kwargs)
+                    fig = dotplot_angsize.figure
+                    print(selector)
+                    fig.add_vline(
+                        x=selector.xrange[0],
+                        line_width=1,
+                        line_color="red",
+                        visible=True
+                    )
+                    
+                    # print(**kwargs)
+                        
+                
+                dotplot_angsize.figure.update_layout(clickmode='event', dragmode='select')
+                dotplot_angsize.set_selection_active(True)
+                # dotplot_angsize.set_selection_callback(on_click)
+                ## I am unsure why on_seleciton works and on_click does not
+                dotplot_angsize.selection_layer.on_selection(on_click)
+                # dotplot_angsize.selection_layer.on_click(on_click)
                 
                 ViewerLayout(dotplot_angsize)
                 ViewerLayout(dotplot_distance)

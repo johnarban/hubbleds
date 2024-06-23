@@ -10,7 +10,8 @@ from hubbleds.viewers.hubble_dotplot import HubbleDotPlotView, HubbleDotPlotView
 @solara.component
 def DotplotViewer(gjapp, viewer: HubbleDotPlotViewer | None = None, data=None, component_id=None, title = None, height=400, on_click_callback = None):
     
-def DotplotViewer(gjapp, data=None, height=400):
+    vertical_line_visible = solara.use_reactive(True)
+    
     with rv.Card() as main:
         with rv.Toolbar(dense=True, color="primary"):
             with rv.ToolbarTitle():
@@ -35,12 +36,30 @@ def DotplotViewer(gjapp, data=None, height=400):
             else:
                 dotplot_view = viewer
             
-            dotplot_test_data = Data(x=[randint(1, 10) for _ in range(30)])
-            gjapp.data_collection.append(dotplot_test_data)
-            dotplot_view = gjapp.new_data_viewer(
-                HubbleDotPlotView, data=dotplot_test_data, show=False
-            )
-
+            # def on_click(**kwargs):
+            #     fig = dotplot_view.figure
+            #     fig.add_vline(
+            #         x=kwargs['points']['xs'][0],
+            #         line_width=1,
+            #         line_color="red",
+            #         annotation=f"{round(kwargs['points']['xs'][0])}",
+            #         visible=vertical_line_visible.value
+            #     )
+                
+            #     if on_click_callback is not None:
+            #         on_click_callback(**kwargs)
+                    
+            
+            # if on_click_callback is not None:
+            #     dotplot_view.set_selection_active(True)
+            #     dotplot_view.set_selection_callback(on_click)
+            # else:
+            #     dotplot_view.set_selection_callback(None)
+            #     dotplot_view.set_selection_active(False)
+            #     dotplot_view.figure.on_edits_completed(dotplot_view.figure.plotly_relayout({'selections': [], 'dragmode': False}))
+            
+            
+            print("component_id", component_id)
             if component_id is not None:
                 dotplot_view.state.x_att = viewer_data.id[component_id]
             
