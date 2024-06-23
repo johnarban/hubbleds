@@ -1,6 +1,7 @@
 import dataclasses
 from cosmicds.state import GLOBAL_STATE, BaseState
 from solara import Reactive
+from glue.core import Data
 from glue.core.data_factories import load_data
 from pathlib import Path
 from hubbleds.decorators import computed_property
@@ -79,8 +80,15 @@ LOCAL_STATE = LocalState()
 
 
 def add_link(from_dc_name, from_att, to_dc_name, to_att):
-    from_dc = GLOBAL_STATE.data_collection[from_dc_name]
-    to_dc = GLOBAL_STATE.data_collection[to_dc_name]
+    if isinstance(from_dc_name, Data):
+        from_dc = from_dc_name
+    else:
+        from_dc = GLOBAL_STATE.data_collection[from_dc_name]
+    
+    if isinstance(to_dc_name, Data):
+        to_dc = to_dc_name
+    else:
+        to_dc = GLOBAL_STATE.data_collection[to_dc_name]
     GLOBAL_STATE._glue_app.add_link(from_dc, from_att, to_dc, to_att)
 
 

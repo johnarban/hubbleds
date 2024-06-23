@@ -26,7 +26,8 @@ from ...widgets.selection_tool import SelectionTool
 from ...data_models.student import student_data, StudentMeasurement, example_data
 from .component_state import ComponentState, Marker, ELEMENT_REST
 from ...remote import DatabaseAPI
-
+from ...data_management import EXAMPLE_GALAXY_SEED_DATA, DB_VELOCITY_FIELD
+from glue.core import Data
 
 GUIDELINE_ROOT = Path(__file__).parent / "guidelines"
 
@@ -230,7 +231,13 @@ def Page():
     #  a conditional will result in an error.
     def glue_setup():
         gjapp = JupyterApplication(GLOBAL_STATE.data_collection, GLOBAL_STATE.session)
-
+        # Get the example seed data
+        if EXAMPLE_GALAXY_SEED_DATA not in gjapp.data_collection:
+            example_seed_data = DatabaseAPI.get_example_seed_measurement()
+            data = Data(label=EXAMPLE_GALAXY_SEED_DATA, **{k: np.asarray([r[k] for r in example_seed_data]) for k in example_seed_data[0].keys()})
+            gjapp.data_collection.append(data)
+        else:
+            data = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
         return gjapp
 
     gjapp = solara.use_memo(glue_setup)
@@ -685,7 +692,7 @@ def Page():
                     ),
                 )
 
-                DotplotViewer(gjapp)
+                DotplotViewer(gjapp, data=gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA], component_id=DB_VELOCITY_FIELD)
 
             if component_state.is_current_step(Marker.ref_dat1):
                 ReflectVelocitySlideshow(

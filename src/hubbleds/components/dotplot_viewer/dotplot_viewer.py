@@ -4,10 +4,12 @@ import solara
 from glue.core import Data
 from reacton import ipyvuetify as rv
 
-from hubbleds.viewers.hubble_dotplot import HubbleDotPlotView
+from hubbleds.viewers.hubble_dotplot import HubbleDotPlotView, HubbleDotPlotViewer
 
 
 @solara.component
+def DotplotViewer(gjapp, viewer: HubbleDotPlotViewer | None = None, data=None, component_id=None, title = None, height=400, on_click_callback = None):
+    
 def DotplotViewer(gjapp, data=None, height=400):
     with rv.Card() as main:
         with rv.Toolbar(dense=True, color="primary"):
@@ -20,12 +22,31 @@ def DotplotViewer(gjapp, data=None, height=400):
         viewer_container = rv.Html(tag="div", style_=f"width: 100%; height: {height}px")
 
         def _add_viewer():
+            if data is None:
+                viewer_data = Data(label = "Test Data", x=[randint(1, 10) for _ in range(30)])
+                gjapp.data_collection.append(viewer_data)
+            else: 
+                viewer_data = data
+            
+            if viewer is None:
+                dotplot_view: HubbleDotPlotViewer = gjapp.new_data_viewer(
+                    HubbleDotPlotView, data=viewer_data, show=False
+                )
+            else:
+                dotplot_view = viewer
+            
             dotplot_test_data = Data(x=[randint(1, 10) for _ in range(30)])
             gjapp.data_collection.append(dotplot_test_data)
             dotplot_view = gjapp.new_data_viewer(
                 HubbleDotPlotView, data=dotplot_test_data, show=False
             )
 
+            if component_id is not None:
+                dotplot_view.state.x_att = viewer_data.id[component_id]
+            
+            if title is not None:
+                dotplot_view.state.title = title
+    
             title_widget = solara.get_widget(title_container)
             title_widget.children = (dotplot_view.state.title or "DOTPLOT VIEWER",)
 

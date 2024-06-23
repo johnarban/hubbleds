@@ -4,6 +4,10 @@ from numpy import argsort, pi
 
 from cosmicds.utils import mode, percent_around_center_indices
 
+from .data_models.student import StudentMeasurement
+from glue.core import Data
+from numpy import asarray
+
 try:
     from astropy.cosmology import Planck18 as planck
 except ImportError:
@@ -126,3 +130,13 @@ def data_summary_for_component(data, component_id):
         summary[f"{percent}%"] = (bottom, top)
 
     return summary
+
+def measurement_list_to_glue_data(measurements: list[StudentMeasurement] | list[dict], label = ""):
+    x = []
+    for measurement in measurements:
+        if isinstance(measurement, StudentMeasurement):
+            x.append(measurement.model_dump())
+        else:
+            x.append(measurement)
+    return Data(label = label, **{k: asarray([r[k] for r in x]) for k in x[0].keys()})
+

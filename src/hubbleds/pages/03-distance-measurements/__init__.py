@@ -4,29 +4,33 @@ from cosmicds.components import ScaffoldAlert, StateEditor, MathJaxSupport, Plot
 import astropy.units as u
 from cosmicds import load_custom_vue_components
 from glue_jupyter.app import JupyterApplication
+from glue_jupyter.table import TableViewer
 from reacton import component, ipyvuetify as rv
 from pathlib import Path
 
 from hubbleds.widgets.distance_tool.distance_tool import DistanceTool
 
-from ...components import AngsizeDosDontsSlideshow, DataTable
+from ...components import AngsizeDosDontsSlideshow, DataTable, DotplotViewer
 from ...data_management import *
-from ...utils import DISTANCE_CONSTANT, GALAXY_FOV, distance_from_angular_size
+from ...utils import DISTANCE_CONSTANT, GALAXY_FOV, distance_from_angular_size, measurement_list_to_glue_data
 from ...state import GLOBAL_STATE, LOCAL_STATE, mc_callback, mc_serialize_score
 from ...widgets.selection_tool import SelectionTool
 from ...data_models.student import student_data, StudentMeasurement, example_data, StudentData
 from .component_state import ComponentState, Marker
 
 from ...viewers.hubble_dotplot import HubbleDotPlotView, HubbleDotPlotViewer
+from ...remote import DatabaseAPI
+from cosmicds.components import ViewerLayout
+from pandas import DataFrame
+from numpy import asarray
 
 
 GUIDELINE_ROOT = Path(__file__).parent / "guidelines"
 
-gjapp = JupyterApplication(GLOBAL_STATE.data_collection, GLOBAL_STATE.session)
-
+from glue.core import Data
+from typing import List, Optional, cast
 
 component_state = ComponentState()
-
 
 def _update_angular_size(data, galaxy, angular_size, count):
     if bool(galaxy) and angular_size is not None:
@@ -82,6 +86,13 @@ def DistanceToolComponent(galaxy, show_ruler, angular_size_callback, ruler_count
 
 @solara.component
 def Page():
+    def _load_db_state():
+        # Load stored component state from database, measurement data is
+        #   considered higher-level and is loaded when the story starts.
+        DatabaseAPI.get_story_state(component_state)
+
+    solara.use_thread(_load_db_state)
+    
     # Mount external javascript libraries
     def _load_math_jax():
         MathJaxSupport()
@@ -97,18 +108,54 @@ def Page():
     #  being rendered in. Currently, in order to trigger subscribed callbacks,
     #  state connections need to be initialized _inside_ a Page.
     component_state.setup()
+    
+    
+    
+    def glue_setup():
+        gjapp = JupyterApplication(GLOBAL_STATE.data_collection, GLOBAL_STATE.session)
+        
+        # Get the example seed data
+        if EXAMPLE_GALAXY_SEED_DATA not in gjapp.data_collection:
+            example_seed_data = DatabaseAPI.get_example_seed_measurement()
+            data = Data(label=EXAMPLE_GALAXY_SEED_DATA, **{k: asarray([r[k] for r in example_seed_data]) for k in example_seed_data[0].keys()})
+            gjapp.data_collection.append(data)
+        else:
+            data = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
+        # cast is for type hinting purposes. It's not necessary for the code to run.
+        v1  = cast(HubbleDotPlotViewer, gjapp.new_data_viewer(HubbleDotPlotView, data=data, show=False))
+        v1.state.x_att = data.id[DB_ANGSIZE_FIELD] # ang_size_value
+        v1.state.title = "Angular Size Measurements"
+        v1.figure.update_xaxes(showline=True, mirror=False)
+        v1.figure.update_yaxes(showline=True, mirror=False)
+        
+        v2  = cast(HubbleDotPlotViewer, gjapp.new_data_viewer(HubbleDotPlotView, data=data, show=False))
+        v2.state.x_att = data.id[DB_DISTANCE_FIELD] # est_dist_value
+        v2.state.title = "Distance Measurements"
+        v2.figure.update_xaxes(showline=True, mirror=False)
+        v2.figure.update_yaxes(showline=True, mirror=False)
+        
+        return gjapp, v1, v2
+    
+    gjapp, dotplot_angsize, dotplot_distance = solara.use_memo(glue_setup)
+    
 
     mc_scoring, set_mc_scoring  = solara.use_state(LOCAL_STATE.mc_scoring.value)
 
     StateEditor(Marker, component_state) 
     # This will print the tables 
     # need to > from pandas import DataFrame
-    # def meas_to_df(meas):
-    #     meas = meas.model_dump()
-    #     gal = meas.pop('galaxy')
-    #     # gal = gal.model_dump(exclude={'spectrum'})
-    #     gal = {k:v for k,v in gal.items() if k != 'spectrum'}
-    #     return {**gal, **meas}
+    def meas_to_df(meas):
+        try:
+            meas = meas.model_dump()
+        except AttributeError:
+            pass
+        try:
+            gal = meas.pop('galaxy')
+        except:
+            gal = {}
+        # gal = gal.model_dump(exclude={'spectrum'})
+        gal = {k:v for k,v in gal.items() if k != 'spectrum'}
+        return {**gal, **meas}
     
     # solara.HTML(unsafe_innerHTML=DataFrame([meas_to_df(s) for s in student_data.measurements or []]).to_html())
     # solara.HTML(unsafe_innerHTML=DataFrame([meas_to_df(s) for s in example_data.measurements or []]).to_html())
@@ -125,7 +172,6 @@ def Page():
         #     component_state.transition_to(Marker.sel_gal3, force=True)
 
         # solara.Button("Select 5 Galaxies", on_click=_on_select_galaxies_clicked)
-
 
     with solara.ColumnsResponsive(12, large=[4,8]):
         with rv.Col():
@@ -226,13 +272,28 @@ def Page():
                 return example_data if on_example_galaxy_marker.value else student_data
 
             def _ang_size_cb(angle):
-                data = example_data if on_example_galaxy_marker.value else student_data
+                """
+                Callback for when the angular size is measured. This function
+                updates the angular size of the galaxy in the data model and
+                puts the measurements in the database.
+                """
+                data = current_data.value
                 count = component_state.example_angular_sizes_total if on_example_galaxy_marker.value else component_state.angular_sizes_total
                 _update_angular_size(data, current_galaxy.value, angle, count)
+                DatabaseAPI.put_measurements(samples=on_example_galaxy_marker.value)
                 if on_example_galaxy_marker.value:
                     value = int(angle.to(u.arcsec).value)
                     component_state.meas_theta.set(value)
                     component_state.n_meas.set(component_state.n_meas.value + 1)
+            def _distance_cb(theta):
+                """
+                Callback for when the distance is estimated. This function
+                updates the distance of the galaxy in the data model and
+                puts the measurements in the database.
+                """
+                _update_distance_measurement(current_data.value, current_galaxy.value, theta)
+                print('_distance_cb. example:', on_example_galaxy_marker.value)
+                DatabaseAPI.put_measurements(samples=on_example_galaxy_marker.value)
 
             def _get_ruler_clicks_cb(count):
                 component_state.ruler_click_count.set(count)
@@ -254,6 +315,9 @@ def Page():
 
     with solara.ColumnsResponsive(12, large=[4,8]):
         with rv.Col():
+            
+            
+            
             ScaffoldAlert(
                 # TODO This will need to be wired up once table is implemented
                 GUIDELINE_ROOT / "GuidelineChooseRow1.vue",
@@ -293,7 +357,7 @@ def Page():
                 event_back_callback=lambda *args: component_state.transition_previous(),
                 can_advance=component_state.can_transition(next=True),
                 show=component_state.is_current_step(Marker.est_dis3),
-                event_set_distance=lambda theta: _update_distance_measurement(current_data.value, current_galaxy.value, theta),
+                event_set_distance=_distance_cb,
                 state_view={
                     "distance_const": DISTANCE_CONSTANT,
                     "meas_theta": component_state.meas_theta.value,
@@ -354,6 +418,8 @@ def Page():
                             if measurement.galaxy is not None:
                                 count += 1
                                 _update_distance_measurement(student_data, measurement.galaxy.model_dump(), measurement.ang_size)
+                        print(f"Filled {count} distances")
+                        DatabaseAPI.put_measurements(samples=False)
                         print(f"Filled {count} distances")
                     else:
                         print("No measurements to fill")
@@ -475,5 +541,41 @@ def Page():
             )
 
         with rv.Col():
+            
+            with rv.Card(class_="pa-0 ma-0", elevation=0):
+                
+                
+                def add_link(from_dc_name, from_att, to_dc_name, to_att):
+                    if isinstance(from_dc_name, Data):
+                        from_dc = from_dc_name
+                    else:
+                        from_dc = gjapp.data_collection[from_dc_name]
+                    
+                    if isinstance(to_dc_name, Data):
+                        to_dc = to_dc_name
+                    else:
+                        to_dc = gjapp.data_collection[to_dc_name]
+                    gjapp.add_link(from_dc, from_att, to_dc, to_att)
+
+                
+                def add_student_measurement():
+                    if example_data.measurements:
+                        example_data_glue = measurement_list_to_glue_data(example_data.measurements, label=EXAMPLE_GALAXY_MEASUREMENTS)
+                        example_data_glue.style.color = "red"
+                        gjapp.data_collection.append(example_data_glue)
+                        egsd = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
+                        add_link(egsd, DB_ANGSIZE_FIELD, example_data_glue,"ang_size")
+                        add_link(egsd, DB_DISTANCE_FIELD, example_data_glue,"est_dist")
+                        dotplot_angsize.add_data(example_data_glue)
+                        dotplot_distance.add_data(example_data_glue)
+                
+                # if component_state.current_step_at_or_after(Marker.dot_seq5):
+                solara.Button("Add Example Data", on_click=add_student_measurement)
             solara.Markdown("blah blah")
 
+                
+                ViewerLayout(dotplot_angsize)
+                ViewerLayout(dotplot_distance)
+
+            
+            

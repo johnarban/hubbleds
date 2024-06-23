@@ -7,7 +7,11 @@ from io import BytesIO
 from astropy.io import fits
 from .state import LOCAL_STATE
 import datetime
+from .data_management import DB_VELOCITY_FIELD
 
+from numpy.random import Generator, PCG64, SeedSequence
+from numpy import arange, asarray
+from typing import Any
 
 ELEMENT_REST = {"H-α": 6562.79, "Mg-I": 5176.7}
 
@@ -217,3 +221,31 @@ class DatabaseAPI:
             f"{API_URL}/story-state/{GLOBAL_STATE.student.id.value}/hubbles_law",
             json=state,
         )
+    
+    @staticmethod
+    def get_example_seed_measurement() -> list[dict[str, Any]]:
+        url = f"{API_URL}/{HUBBLE_ROUTE_PATH}/sample-measurements"
+        r = GLOBAL_STATE.request_session.get(url)
+        res_json = r.json()
+        
+        
+        # TODO: Note that though this is from the old code
+        # it seems to only pick the 2nd measurement
+        vels = [record[DB_VELOCITY_FIELD] for record in res_json]
+        good = [vel is not None for vel in vels]
+        seq = SeedSequence(42)
+        gen = Generator(PCG64(seq))
+        indices = arange(len(good))
+        indices = indices[1::2][:85] # we need to keep the first 85 so that it always selects the same galaxies "randomly"
+        random_subset = gen.choice(indices[good[1::2][:85]], size=40, replace=False)
+        # This is the subset
+        # [121, 11, 143, 21, 161, 127, 111, 15, 69, 105, 
+        # 81, 9, 129, 91, 99, 17, 35, 169, 67, 107, 119, 
+        # 123, 43, 141, 73, 137, 85, 59, 87, 25, 109, 49, 
+        # 47, 95, 157, 63, 89, 57, 149, 103]
+        measurements = []
+        for i in random_subset:
+            measurements.append(res_json[i])
+
+        return measurements
+
