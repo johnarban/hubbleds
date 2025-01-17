@@ -1003,7 +1003,7 @@ def Page():
                     
                     tut_viewer_data = None
                     if EXAMPLE_GALAXY_SEED_DATA in gjapp.data_collection:
-                        tut_viewer_data = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
+                        tut_viewer_data = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA+'_first']
                     DotplotTutorialSlideshow(
                         dialog=COMPONENT_STATE.value.show_dotplot_tutorial_dialog,
                         step=COMPONENT_STATE.value.dotplot_tutorial_state.step,
