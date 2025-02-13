@@ -407,12 +407,10 @@ def Page():
 
     
 
-    def create_dotplot_viewer(first_dotplot = True, show_which_meas = 'first', show_which_seed = 'first', ignore_full_seed_data = True, ignore_full_meas_data = True):
+    def create_dotplot_viewer(first_dotplot = True, show_which_meas = 'first', show_which_seed = 'first', show_full_meas_data = True):
         print("\n\n ======== \ncreate_dotplot_viewer\n\n")
         show_meas = COMPONENT_STATE.value.current_step >= Marker.int_dot1        
         ignore = []
-        
-        if show_meas and (EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection):
             
             if show_which_seed == 'first':
                 seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_first']
@@ -420,42 +418,27 @@ def Page():
                 seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_second']
             else:
                 seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
+        
+        if show_meas and (EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection):
             
             viewer_data = [
-                gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS],
-                seed
-            ]
-            # If the student has made a measurement, that is the 0th layer.
-            layer0 = gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS]
-            zorder = [1,5]
-            if ignore_full_meas_data:
+                seed,
+                gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS]
+                ]
+            
+            # we only ever show subsets. so always ignore the full data
                 ignore.append(gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS])
+            
             if show_which_meas == 'second': # ignore the first
-                first = subset_by_label(layer0, "first measurement")
-                if first is not None:
-                    ignore.append(first)
+                subset = subset_by_label(gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS], "first measurement")
+                if subset is not None:
+                    ignore.append(subset)
             elif show_which_meas == 'first': # ignore the second
-                second = subset_by_label(layer0, "second measurement")
-                if second is not None:
-                    ignore.append(second)
+                subset = subset_by_label(gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS], "second measurement")
+                if subset is not None:
+                    ignore.append(subset)
         else:
-            viewer_data = [gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]]
-            # If the student has NOT made a measurement, the seed data is the 0th layer.
-            layer0 = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
-            zorder = None
-        
-        # seed_data = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
-        # if ignore_full_seed_data:
-        #     ignore.append(gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA])
-        # if show_which_seed == 'second': # ignore the first
-        #     first = subset_by_label(seed_data, "first measurement")
-        #     if first is not None:
-        #         ignore.append(first)
-        # elif show_which_seed == 'first': # ignore the second
-        #     second = subset_by_label(seed_data, "second measurement")
-        #     if second is not None:
-        #         ignore.append(second)
-
+            viewer_data = [seed]
         
         
         
@@ -465,12 +448,15 @@ def Page():
             wavelength = sync_example_velocity_to_wavelength(point.xs[0])
             if wavelength:
                 sync_wavelength_line.set(wavelength)
+        
         logger.info(f"\n IGNORED LAYERS: {ignore} \n")
+        
         with solara.Div() as main:
             title = "Dotplot: Example Galaxy Velocities"
             if not first_dotplot:
                 title += " (2nd Measurement)"
             solara.Text(title)
+            solara.Markdown(gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS].to_dataframe()[['obs_wave_value','velocity_value', 'measurement_number']].to_markdown())
             solara.Text(f"Ignored layers: {ignore}")
             DotplotViewer(
                 gjapp,

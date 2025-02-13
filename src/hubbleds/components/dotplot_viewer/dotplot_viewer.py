@@ -306,15 +306,16 @@ def DotplotViewer(
             
 
             def apply_zorder():
-                logger.info(f"({title}) Applying zorder")
-                if zorder:
-                    logger.info(f"({title}) zorder: {zorder}")
-                    logger.info(f"({title}) layers: {dotplot_view.layers}")
-                    for i, layer in enumerate(dotplot_view.layers):
-                        try:
-                            layer.state.zorder = zorder[i]
-                        except IndexError:
-                            layer.state.zorder = max(zorder) + 1
+                pass
+                # logger.info(f"({title}) Applying zorder")
+                # if zorder:
+                #     logger.info(f"({title}) zorder: {zorder}")
+                #     logger.info(f"({title}) layers: {dotplot_view.layers}")
+                #     for i, layer in enumerate(dotplot_view.layers):
+                #         try:
+                #             layer.state.zorder = zorder[i]
+                #         except IndexError:
+                #             layer.state.zorder = max(zorder) + 1
             
             # prevent_callback = False
             
@@ -352,8 +353,8 @@ def DotplotViewer(
                     logger.info(f'({title}) Bounds already set')
             
             def extend_the_tools():  
-                extend_tool(dotplot_view, 'plotly:home', activate_cb=apply_zorder)
-                extend_tool(dotplot_view, 'hubble:wavezoom', deactivate_cb=apply_zorder)
+                # extend_tool(dotplot_view, 'plotly:home', activate_cb=apply_zorder)
+                # extend_tool(dotplot_view, 'hubble:wavezoom', deactivate_cb=apply_zorder)
                 extend_tool(dotplot_view, 'plotly:home', activate_cb=_on_reset_bounds, activate_before_tool=False)
                 extend_tool(dotplot_view, 'hubble:wavezoom', deactivate_cb=_on_bounds_changed, )
             extend_the_tools()
