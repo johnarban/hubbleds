@@ -18,19 +18,6 @@ from .utils import _add_link
 from .state import StudentMeasurement
 
 
-def create_measurement_subsets(gjapp: JupyterApplication, data: Data):
-    if data.label in gjapp.data_collection:
-        data = gjapp.data_collection[data.label]
-        current_subsets = data.subsets
-        if 'first measurement' not in (s.label for s in current_subsets):
-            first = data.new_subset(data.id['measurement_number'] == 'first', label='first measurement')
-            first.style.color = GENERIC_COLOR
-            first.style.alpha = 1.0
-        if 'second measurement' not in (s.label for s in current_subsets):
-            second = data.new_subset(data.id['measurement_number'] == 'second', label='second measurement')
-            second.style.color = GENERIC_COLOR
-            second.style.alpha = 1.0
-
 
 def create_example_subsets(gjapp: JupyterApplication, data: Data):
     if EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection:
