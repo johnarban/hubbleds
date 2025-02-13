@@ -25,11 +25,11 @@ def create_example_subsets(gjapp: JupyterApplication, data: Data):
         current_subsets = example_data.subsets
         if 'first measurement' not in (s.label for s in current_subsets):
             first = example_data.new_subset(example_data.id['measurement_number'] == 'first', label='first measurement')
-            first.style.color = MY_DATA_COLOR
+            first.style.color = "#a5d5e5" #MY_DATA_COLOR
             first.style.alpha = 1.0
         if 'second measurement' not in (s.label for s in current_subsets):
             second = example_data.new_subset(example_data.id['measurement_number'] == 'second', label='second measurement')
-            second.style.color = MY_DATA_COLOR
+            second.style.color = "#04f6a3" #MY_DATA_COLOR
             second.style.alpha = 1.0
             
 
