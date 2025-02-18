@@ -23,6 +23,7 @@ from solara.toestand import Reactive
 import numpy as np
 
 from cosmicds.components import LayerToggle
+from cosmicds.components.layer_toggle import _LayerToggle
 
 from cosmicds.logger import setup_logger
 logger = setup_logger("DOTPLOT")
@@ -100,8 +101,13 @@ def DotplotViewer(
     x_bounds = solara.use_reactive(x_bounds) # type: ignore
     reset_bounds = solara.use_reactive(reset_bounds)
     hide_layers = solara.use_reactive(hide_layers)
+    # viewer: Reactive[Optional[PlotlyBaseView]] = solara.use_reactive(None)
+    viewer:Optional[PlotlyBaseView] = None
+    
+    
     
     with rv.Card() as main:
+        layer_toggle_container = rv.Html(tag="div")
         with rv.Toolbar(dense=True, class_="toolbar"):
             with rv.ToolbarTitle(class_="toolbar toolbar-title"):
                 title_container = rv.Html(tag="div")
@@ -111,14 +117,14 @@ def DotplotViewer(
 
         viewer_container = rv.Html(tag="div", style_=f"width: 100%; height: {height}px", class_="mb-4")
         
-        def _line_ids_for_viewer(viewer: PlotlyBaseView):
-            line_ids = []
-            traces = list(chain(l.traces() for l in viewer.layers))
-            for trace in viewer.figure.data:
-                if trace not in traces and isinstance(trace, Scatter) and getattr(trace, "meta", None):
-                    line_ids.append(trace.meta)
+        # def _line_ids_for_viewer(viewer: PlotlyBaseView):
+        #     line_ids = []
+        #     traces = list(chain(l.traces() for l in viewer.layers))
+        #     for trace in viewer.figure.data:
+        #         if trace not in traces and isinstance(trace, Scatter) and getattr(trace, "meta", None):
+        #             line_ids.append(trace.meta)
 
-            return line_ids
+        #     return line_ids
         
         def _remove_lines(viewers: List[PlotlyBaseView], line_ids: List[List[str]]):
             if not line_ids:
@@ -133,9 +139,38 @@ def DotplotViewer(
             line_id = str(uuid4())
             line_ids.append(line_id)
             viewer.figure.add_vline(x=value, line_color=color, line_width=2, name=line_id)
+        
+        def get_layer(viewer, layer_name):
+                layer_artist = viewer.layer_artist_for_data(layer_name) # type: ignore
+                if layer_artist is None:
+                    logger.warning(f"Layer not found: {layer_name}")
+                return layer_artist
+        
+        def hide_ignored_layers(viewer: PlotlyBaseView | None, hide_layers: Reactive[list]):
+                # if isinstance(viewer, Reactive):
+                #     viewer = viewer.value
+                if viewer is None:
+                    logger.info('hide_ignored_layers: Viewer is None. skipping')
+                    return
+                logger.info("Hiding ignored layers")
+                layers = viewer.layers
+                logger.info(layers);
+                hidden_layers = [get_layer(viewer, l) for l in hide_layers.value] # type: ignore
+                logger.info(f'There are {len(hidden_layers)} to ignore')
+                for layer in layers:
+                    if (layer is not None):
+                        if layer in hidden_layers:
+                            logger.info(f"({title}) Hiding layer: {layer.layer.label}")
+                        else:
+                            logger.info(f"({title}) Showing layer: {layer.layer.label}")
 
+                        layer.visible = not (layer in hidden_layers)
+                layer_status = ''.join([f"{l.layer.label}: {'visible' if l.visible else 'not visible'}" for l in viewer.layers])
+        
+        hide_ignored_layers(viewer=viewer, hide_layers=hide_layers)
         
         def _add_data(viewer: PlotlyBaseView, data: Union[Data, tuple]):
+            logger.info(f'Adding data to {title}')
             if isinstance(data, Data):
                 viewer.add_data(data)
             else:
@@ -154,6 +189,7 @@ def DotplotViewer(
             
             dotplot_view: HubbleDotPlotViewer = gjapp.new_data_viewer(
                 HubbleDotPlotView, show=False) # type: ignore
+            viewer = dotplot_view
 
             _add_data(dotplot_view, viewer_data)
             if isinstance(viewer_data, tuple):
@@ -180,37 +216,20 @@ def DotplotViewer(
                 for trace in layer.traces():
                     trace.update(hoverinfo="skip", hovertemplate=None)
 
+                
+            
+            
+            
+            
+            hide_ignored_layers(dotplot_view, hide_layers)
+
             def no_hover_update(self: DotplotScatterLayerArtist):
                 with dotplot_view.figure.batch_update():
                     _original_update_data(self)
                     for trace in self.traces():
                         trace.update(hoverinfo="skip", hovertemplate=None)
             DotplotScatterLayerArtist._update_data = no_hover_update
-                
-            def get_layer(layer_name):
-                layer_artist = dotplot_view.layer_artist_for_data(layer_name) # type: ignore
-                if layer_artist is None:
-                    logger.warning(f"Layer not found: {layer_name}")
-                return layer_artist
             
-            def hide_ignored_layers(*args):
-                logger.info("Hiding ignored layers")
-                layers = dotplot_view.layers
-                hidden_layers = [get_layer(l) for l in hide_layers.value] # type: ignore
-                # visible_layers = [l for l in layers if l not in hidden_layers]
-                for layer in hidden_layers:
-                    if layer is not None:
-                        # logger.info(f"\n\t({title}) Hiding layer: {layer.layer.label}")
-                        layer.visible = False
-                for layer in layers:
-                    if (layer is not None) and not layer in hidden_layers:
-                        # logger.info(f"\n\t({title}) Showing layer: {layer.layer.label}")
-                        layer.visible = True
-                layer_status = ''.join([f"\n\t{l.layer.label}: {'visible' if l.visible else 'not visible'}" for l in dotplot_view.layers])
-            
-            hide_ignored_layers()
-            hide_layers.subscribe(hide_ignored_layers)
-
             # override the default selection layer
             def new_update_selection(self=dotplot_view):
                 state = cast(DotPlotViewerState, self.state)
@@ -385,6 +404,9 @@ def DotplotViewer(
                 tool.activate()
             
             reset_selection()
+            
+            # layer_toggle = _LayerToggle(viewer = dotplot_view)
+            # solara.get_widget(layer_toggle_container).children = (layer_toggle,)
             
             viewer_data_log = ''.join([f"\n\t{l.layer.label}: {'visible' if l.visible else 'not visible'}" for l in dotplot_view.layers])            
             

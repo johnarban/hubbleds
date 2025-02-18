@@ -411,13 +411,13 @@ def Page():
         print("\n\n ======== \ncreate_dotplot_viewer\n\n")
         show_meas = COMPONENT_STATE.value.current_step >= Marker.int_dot1        
         ignore = []
-            
-            if show_which_seed == 'first':
-                seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_first']
-            elif show_which_seed == 'second':
-                seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_second']
-            else:
-                seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
+        
+        if show_which_seed == 'first':
+            seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_first']
+        elif show_which_seed == 'second':
+            seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_second']
+        else:
+            seed = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
         
         if show_meas and (EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection):
             
@@ -427,7 +427,7 @@ def Page():
                 ]
             
             # we only ever show subsets. so always ignore the full data
-                ignore.append(gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS])
+            ignore.append(gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS])
             
             if show_which_meas == 'second': # ignore the first
                 subset = subset_by_label(gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS], "first measurement")
@@ -439,7 +439,7 @@ def Page():
                     ignore.append(subset)
         else:
             viewer_data = [seed]
-        
+
         
         
         # we'll need to use/modify this for syncing 2 dot plots or for syncing auto-zoomed in x-ranges.
@@ -988,25 +988,25 @@ def Page():
                     tut_viewer_data = None
                     if EXAMPLE_GALAXY_SEED_DATA in gjapp.data_collection:
                         tut_viewer_data = gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA]
-                    DotplotTutorialSlideshow(
-                        dialog=COMPONENT_STATE.value.show_dotplot_tutorial_dialog,
-                        step=COMPONENT_STATE.value.dotplot_tutorial_state.step,
-                        length=COMPONENT_STATE.value.dotplot_tutorial_state.length,
-                        max_step_completed=COMPONENT_STATE.value.dotplot_tutorial_state.max_step_completed,
-                        dotplot_viewer=DotplotViewer(gjapp,
-                                                    data=tut_viewer_data,
-                                                    component_id=DB_VELOCITY_FIELD,
-                                                    vertical_line_visible=False,
-                                                    line_marker_color=LIGHT_GENERIC_COLOR,
-                                                    unit="km / s",
-                                                    x_label="Velocity (km/s)",
-                                                    y_label="Count"
-                                                    ),
+                    # DotplotTutorialSlideshow(
+                    #     dialog=COMPONENT_STATE.value.show_dotplot_tutorial_dialog,
+                    #     step=COMPONENT_STATE.value.dotplot_tutorial_state.step,
+                    #     length=COMPONENT_STATE.value.dotplot_tutorial_state.length,
+                    #     max_step_completed=COMPONENT_STATE.value.dotplot_tutorial_state.max_step_completed,
+                    #     dotplot_viewer=DotplotViewer(gjapp,
+                    #                                 data=tut_viewer_data,
+                    #                                 component_id=DB_VELOCITY_FIELD,
+                    #                                 vertical_line_visible=False,
+                    #                                 line_marker_color=LIGHT_GENERIC_COLOR,
+                    #                                 unit="km / s",
+                    #                                 x_label="Velocity (km/s)",
+                    #                                 y_label="Count"
+                    #                                 ),
                                                     
-                        event_tutorial_finished=lambda _: dotplot_tutorial_finished.set(
-                            True
-                        ),
-                    )
+                    #     event_tutorial_finished=lambda _: dotplot_tutorial_finished.set(
+                    #         True
+                    #     ),
+                    # )
                 
     # Dot Plot 1st measurement row
     if COMPONENT_STATE.value.current_step_between(Marker.int_dot1, Marker.dot_seq14): # TODO: Change this back to dot_seq14 if we put back 2nd galaxy measurement
@@ -1098,7 +1098,7 @@ def Page():
                                         
                 if EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection:
                     # add_example_measurements_to_glue() # make sure updated measurements are in glue
-                    create_dotplot_viewer(
+                   create_dotplot_viewer(
                         show_which_meas='first' if COMPONENT_STATE.value.current_step != Marker.rem_vel1 else 'second',
                         show_which_seed='first'
                     )
@@ -1118,11 +1118,11 @@ def Page():
                 )
             with rv.Col(cols=12, lg=8):
                 print("Creating 2nd dotplot viewer")
-                create_dotplot_viewer(
-                    first_dotplot=False,
-                    show_which_meas='second',
-                    show_which_seed='second'
-                )
+                # create_dotplot_viewer(
+                #     first_dotplot=False,
+                #     show_which_meas='second',
+                #     show_which_seed='second'
+                # )
 
 
     # Spectrum Viewer row
