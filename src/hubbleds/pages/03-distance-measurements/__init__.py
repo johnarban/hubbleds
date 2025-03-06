@@ -474,6 +474,16 @@ def Page():
             return 'second'
         else:
             return 'first'
+    
+    def nbin_func(xmin, xmax):
+        # full range is 246422.9213488496
+        if xmin is None or xmax is None or xmin == xmax:
+            return 30
+        frac_range = (xmax - xmin) / 246423
+        max_bins = 100
+        min_bins = 30
+        power = 1.5 # 
+        return 30 + int((frac_range ** power) * (max_bins - min_bins))
 
     with solara.ColumnsResponsive(12, large=[4,8]):
         with rv.Col():
@@ -993,7 +1003,8 @@ def Page():
                                             y_label="Count",
                                             zorder=[5,1],
                                             x_bounds=dist_dotplot_range,
-                                            hide_layers=ignore
+                                            hide_layers=ignore,
+                                            nbin_func=nbin_func,
                                             )
                         if COMPONENT_STATE.value.current_step_at_or_after(Marker.dot_seq4):
                             DotplotViewer(gjapp, 
@@ -1012,7 +1023,8 @@ def Page():
                                                 y_label="Count",
                                                 zorder=[5,1],
                                                 x_bounds=ang_size_dotplot_range,
-                                                hide_layers=ignore
+                                                hide_layers=ignore,
+                                                nbin_func=nbin_func,
                                                 )
                     else:
                         # raise ValueError("Example galaxy measurements not found in glue data collection")
