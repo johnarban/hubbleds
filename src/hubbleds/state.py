@@ -14,7 +14,7 @@ from solara.toestand import Ref
 
 from typing import Callable, Tuple
 
-ELEMENT_REST = {"H-α": 6562.79, "Mg-I": 5176.7}
+from .data_management import ELEMENT_REST
 
 from cosmicds.logger import setup_logger
 
@@ -57,7 +57,7 @@ class GalaxyData(BaseModel):
 
     @property
     def redshift_rest_wave_value(self) -> float:
-        return round(ELEMENT_REST[self.element] * (1 + self.z))
+        return (ELEMENT_REST[self.element] * (1 + self.z))
 
 
 class StudentMeasurement(BaseModel):

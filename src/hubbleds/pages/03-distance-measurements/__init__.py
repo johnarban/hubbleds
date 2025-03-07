@@ -89,6 +89,7 @@ def update_second_example_measurement():
     else:
         logger.info('\t\t no changes for second measurement')
 
+@solara.component
 def DistanceToolComponent(galaxy,
                           show_ruler,
                           angular_size_callback,
@@ -125,13 +126,13 @@ def DistanceToolComponent(galaxy,
     
     solara.use_effect(turn_on_guard, [use_guard])
     
-    def reset_canvas():
+    def _reset_canvas():
         logger.info('resetting canvas')
         widget = cast(DistanceTool,solara.get_widget(tool))
         widget.reset_canvas()
     
     
-    solara.use_effect(reset_canvas, [reset_canvas])
+    solara.use_effect(_reset_canvas, [reset_canvas])
 
     def _define_callbacks():
         widget = cast(DistanceTool,solara.get_widget(tool))
@@ -193,7 +194,7 @@ def Page():
 
     solara.lab.use_task(_write_component_state, dependencies=[COMPONENT_STATE.value])
     
-    
+    measurements_setup = solara.use_reactive(False)
     def _glue_setup() -> JupyterApplication:
         gjapp = gjapp = JupyterApplication(
             GLOBAL_STATE.value.glue_data_collection, GLOBAL_STATE.value.glue_session
@@ -221,6 +222,7 @@ def Page():
             gjapp.data_collection.append(second)
             
             link_seed_data(gjapp)
+        measurements_setup.set(True)
         
         return gjapp
     
@@ -316,6 +318,7 @@ def Page():
         Ref(LOCAL_STATE.fields.measurements).set(measurements)
         Ref(COMPONENT_STATE.fields.angular_sizes_total).set(5)
     
+    subsets_setup = solara.use_reactive(False)
     def add_example_measurements_to_glue():
         logger.info('in add_example_measurements_to_glue')
         if len(LOCAL_STATE.value.example_measurements) > 0:
@@ -325,15 +328,19 @@ def Page():
             create_example_subsets(gjapp, example_measurements_glue)
             
             use_this = add_or_update_data(example_measurements_glue)
+            if EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection:
+                subsets_setup.set(True)
             use_this.style.color = MY_DATA_COLOR
 
             link_example_seed_and_measurements(gjapp)
         else:
             logger.info('no example measurements yet')
-        
+    
+    
     def _glue_data_setup():
         add_example_measurements_to_glue()
         update_second_example_measurement()
+    
     
     solara.use_effect(_glue_data_setup, dependencies=[Ref(LOCAL_STATE.fields.measurements_loaded)])
 
@@ -461,7 +468,6 @@ def Page():
         
         if marker_new == Marker.dot_seq5:
             # clear the canvas before we get to the second measurement. 
-            COMPONENT_STATE.value.show_ruler = False
             reset_canvas.set(reset_canvas.value + 1)
 
         distance_tool_bg_count.set(distance_tool_bg_count.value + 1)
@@ -574,11 +580,10 @@ def Page():
 
             @solara.lab.computed
             def current_galaxy():
-                galaxy = COMPONENT_STATE.value.selected_galaxy
-                example_galaxy = COMPONENT_STATE.value.selected_example_galaxy
-                gal = example_galaxy if on_example_galaxy_marker.value else galaxy
-                logger.info(f'current_galaxy: {gal}')
-                return gal
+                if on_example_galaxy_marker.value:
+                    return COMPONENT_STATE.value.selected_example_galaxy
+                else:
+                    return COMPONENT_STATE.value.selected_galaxy
 
             @solara.lab.computed
             def current_data():
@@ -642,7 +647,8 @@ def Page():
                 logger.info(f'Brightness: {brightness}')
                 current_brightness.set(brightness / 100)
                 
-
+            
+            # solara.Button("Reset Canvas", on_click=lambda: reset_canvas.set(reset_canvas.value + 1))
             DistanceToolComponent(
                 galaxy=current_galaxy.value,
                 show_ruler=COMPONENT_STATE.value.show_ruler,
@@ -651,7 +657,7 @@ def Page():
                 bad_measurement_callback=_bad_measurement_cb,
                 use_guard=True,
                 brightness_callback=brightness_callback,
-                reset_canvas=reset_canvas,
+                reset_canvas=reset_canvas.value,
                 sdss_counter=distance_tool_bg_count,
             )
             
@@ -857,6 +863,13 @@ def Page():
                     value = galaxy["item"]["galaxy"] if flag else None
                     selected_galaxy = Ref(COMPONENT_STATE.fields.selected_galaxy)
                     selected_galaxy.set(value)
+                
+                @solara.lab.computed
+                def selected_galaxy_index():
+                    try:
+                        return [LOCAL_STATE.value.get_measurement_index(COMPONENT_STATE.value.selected_galaxy["id"])]
+                    except:
+                        return []
 
                 @solara.lab.computed
                 def table_kwargs():
@@ -868,6 +881,7 @@ def Page():
                         "items": table_data,
                         "highlighted": False,  # TODO: Set the markers for this,
                         "event_on_row_selected": update_galaxy,
+                        "selected_indices": selected_galaxy_index.value,
                         "show_select": True,
                         "button_icon": "mdi-tape-measure",
                         "show_button": COMPONENT_STATE.value.current_step_at_or_after(Marker.fil_rem1),
@@ -972,9 +986,13 @@ def Page():
                 else:
                     show_dotplot_lines.set(False)
                 
+                
                 if COMPONENT_STATE.value.current_step_between(Marker.dot_seq1, Marker.ang_siz5a):
-                    ignore = []
-                    if EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection:
+                    # solara.Text(f"measurements setup: {measurements_setup.value}")
+                    # solara.Text(f"subsets setup: {subsets_setup.value}")
+                    if measurements_setup.value and subsets_setup.value and EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection:
+                        ignore = []
+                    
                         ignore = [gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS]]
                         if COMPONENT_STATE.value.current_step_at_or_before(Marker.dot_seq5):
                             second = subset_by_label(ignore[0], 'second measurement')
@@ -986,11 +1004,10 @@ def Page():
                                 ignore.append(first)
                     
                     
-                    if EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection:
                         DotplotViewer(gjapp, 
                                         data = [
+                                            gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_first'],
                                             gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS],
-                                            gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_first']
                                             ],
                                             title="Distance",
                                             component_id="est_dist_value",
@@ -1001,16 +1018,16 @@ def Page():
                                             unit="Mpc",
                                             x_label="Distance (Mpc)",
                                             y_label="Count",
-                                            zorder=[5,1],
                                             x_bounds=dist_dotplot_range,
                                             hide_layers=ignore,
                                             nbin_func=nbin_func,
+                                            nbin=30
                                             )
                         if COMPONENT_STATE.value.current_step_at_or_after(Marker.dot_seq4):
                             DotplotViewer(gjapp, 
                                             data = [
+                                                gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_first'], 
                                                 gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS],
-                                                gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA + '_first'] 
                                                 ],
                                                 title="Angular Size",
                                                 component_id="ang_size_value",
@@ -1021,10 +1038,10 @@ def Page():
                                                 unit="arcsec",
                                                 x_label="Angular Size (arcsec)",
                                                 y_label="Count",
-                                                zorder=[5,1],
                                                 x_bounds=ang_size_dotplot_range,
                                                 hide_layers=ignore,
                                                 nbin_func=nbin_func,
+                                                nbin=30
                                                 )
                     else:
                         # raise ValueError("Example galaxy measurements not found in glue data collection")

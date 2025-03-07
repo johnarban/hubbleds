@@ -133,4 +133,4 @@ UNITS_TO_STATE = {
 }
 
 
-ELEMENT_REST = {"H-α": 6562.79, "Mg-I": 5176.7}
+ELEMENT_REST = {"H-α": 6564.61, "Mg-I": 5176.7}

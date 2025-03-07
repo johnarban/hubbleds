@@ -106,6 +106,7 @@ class ComponentState(BaseComponentState, BaseState):
     show_dotplot_tutorial_dialog: bool = False
     dotplot_tutorial_state: DotPlotTutorial = DotPlotTutorial()
     dotplot_tutorial_finished: bool = False
+    dotplot_click_count: int = 0
     has_bad_velocities: bool = False
     has_multiple_bad_velocities: bool = False
     obs_wave_total: int = 0

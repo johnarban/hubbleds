@@ -338,3 +338,8 @@ div.plotly .hoverlayer g.hovertext {
     padding: 8px;
     border: 1px solid #aaa;
 }
+
+
+.v-card:has(.sliders) {
+    z-index: 3 !important;
+  }

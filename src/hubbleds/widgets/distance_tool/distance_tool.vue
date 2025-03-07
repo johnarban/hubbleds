@@ -99,9 +99,10 @@
           </v-btn>
         </template>
         Refresh images
-      </v-tooltip
+      </v-tooltip>
     </div>
     <contrast-brightness-control 
+      class="contrast-brightness-control"
       inline-style="padding: 0.5em 0;"
       :enabled=true  
       :showContrast=false

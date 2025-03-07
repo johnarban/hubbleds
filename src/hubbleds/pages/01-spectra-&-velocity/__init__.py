@@ -358,7 +358,7 @@ def Page():
 
     @computed
     def show_synced_lines():
-        return Ref(COMPONENT_STATE.fields.current_step).value.value >= Marker.dot_seq5.value
+        return Ref(COMPONENT_STATE.fields.current_step).value.value >= Marker.dot_seq5.value and Ref(COMPONENT_STATE.fields.dotplot_click_count).value > 0
 
     
     ## ----- Make sure we are initialized in the correct state ----- ##
@@ -402,7 +402,8 @@ def Page():
     solara.use_effect(_reactive_subscription_setup, dependencies=[])
 
     
-    def dotlpot_click_callback(point):
+    def dotplot_click_callback(point):
+            Ref(COMPONENT_STATE.fields.dotplot_click_count).set(COMPONENT_STATE.value.dotplot_click_count + 1)
             sync_velocity_line.set(point.xs[0])
             wavelength = sync_example_velocity_to_wavelength(point.xs[0])
             if wavelength:
@@ -1051,7 +1052,7 @@ def Page():
                         vertical_line_visible=show_synced_lines.value,
                         line_marker_at=sync_velocity_line.value,
                         line_marker_color=LIGHT_GENERIC_COLOR,
-                        on_click_callback=dotlpot_click_callback,
+                        on_click_callback=dotplot_click_callback,
                         unit="km / s",
                         x_label="Velocity (km/s)",
                         y_label="Count",

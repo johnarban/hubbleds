@@ -123,33 +123,33 @@
 4439,1576,6565,"angstrom",6809,"angstrom",11150,"km / s",32,"arcsecond",197,"Mpc","2023-12-05 08:52:10","first",1,209
 4441,1576,6565,"angstrom",6826,"angstrom",11927,"km / s",31,"arcsecond",203,"Mpc","2023-12-05 09:09:56","first",1.91,209
 4442,1576,6565,"angstrom",6482,"angstrom",-3793,"km / s",80,"arcsecond",79,"Mpc","2023-12-05 09:15:20","first",1,209
-4879,1576,6563,"angstrom",7315,"angstrom",34375,"km/s",37,"arcsecond",170,"Mpc","2024-10-25 16:41:36","first",0,215
-4879,1576,6563,"angstrom",6189,"angstrom",-17096,"km / s",37,"arcsecond",170,"Mpc","2024-10-25 20:13:54","second",0,215
-4899,1576,6563,"angstrom",6899,"angstrom",15359,"km/s",42,"arcsecond",150,"Mpc","2024-07-29 17:45:57","first",0,215
-5000,1576,6563,"angstrom",6814,"angstrom",11473,"km / s",39,"arcsecond","","Mpc","2024-09-24 16:01:23","first",0,215
-5018,1576,6563,"angstrom",7079,"angstrom",23587,"km / s",41,"arcsecond",154,"Mpc","2024-10-04 21:33:02","first",0,215
-5018,1576,6563,"angstrom",6803,"angstrom",10971,"km / s",42,"arcsecond",148,"Mpc","2024-10-04 21:37:36","second",0,215
-5030,1576,6563,"angstrom",6990,"angstrom",19519,"km / s",37,"arcsecond",170,"Mpc","2024-10-08 18:45:09","first",0,215
-5030,1576,6563,"angstrom",6990,"angstrom",19519,"km / s",37,"arcsecond",170,"Mpc","2024-10-08 18:45:12","second",0,215
-4914,1576,6563,"angstrom",6809,"angstrom",11245,"km/s",33,"arcsecond",191,"Mpc","2024-07-31 17:55:27","first",0,216
-4915,1576,6563,"angstrom",8400,"angstrom",11336,"km/s",43,"arcsecond",147,"Mpc","2024-07-31 17:56:25","first",0,216
-4916,1576,6563,"angstrom",6836,"angstrom",12479,"km/s",35,"arcsecond",180,"Mpc","2024-07-31 17:58:42","first",0,216
-4917,1576,6563,"angstrom",6811,"angstrom",11336,"km/s",34,"arcsecond",191,"Mpc","2024-07-31 17:52:21","first",0,216
-4918,1576,6563,"angstrom",6831,"angstrom",12250,"km/s",1600,"arcsecond",4,"Mpc","2024-07-31 17:45:00","first",0,216
-4919,1576,6563,"angstrom",6809,"angstrom",11245,"km/s",29,"arcsecond",217,"Mpc","2024-07-31 18:22:48","first",0,216
-4920,1576,6563,"angstrom",6823,"angstrom",11885,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 17:31:17","first",0,216
-4921,1576,6563,"angstrom",6808,"angstrom",11199,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 18:20:11","first",0,216
-4922,1576,6563,"angstrom",6812,"angstrom",11382,"km/s",80,"arcsecond",79,"Mpc","2024-07-31 17:56:49","first",0,216
-4923,1576,6563,"angstrom",6808,"angstrom",11199,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 17:41:04","first",0,216
-4924,1576,6563,"angstrom",6812,"angstrom",11382,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 18:04:34","first",0,216
-4926,1576,6563,"angstrom",6828,"angstrom",12113,"km/s",33,"arcsecond",191,"Mpc","2024-07-31 18:12:59","first",0,216
-4927,1576,6563,"angstrom",6806,"angstrom",11108,"km/s",25,"arcsecond",252,"Mpc","2024-07-31 17:43:30","first",0,216
-4928,1576,6563,"angstrom",6806,"angstrom",11336,"km/s",32,"arcsecond",197,"Mpc","2024-07-31 18:13:10","first",0,216
-4930,1576,6563,"angstrom",6803,"angstrom",10971,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 18:05:21","first",0,216
-4931,1576,6563,"angstrom",6809,"angstrom",11245,"km/s",85,"arcsecond",74,"Mpc","2024-07-31 17:31:05","first",0,216
-4932,1576,6563,"angstrom",6811,"angstrom",11336,"km/s",17,"arcsecond",371,"Mpc","2024-07-31 17:41:16","first",0,216
-4933,1576,6563,"angstrom",6808,"angstrom",11199,"km/s",32,"arcsecond",203,"Mpc","2024-07-31 18:00:30","first",0,216
-4934,1576,6563,"angstrom",6811,"angstrom",11336,"km/s",157,"arcsecond",40,"Mpc","2024-07-31 17:36:11","first",0,216
-4935,1576,6563,"angstrom",6803,"angstrom",46,"km/s",35,"arcsecond",180,"Mpc","2024-07-31 17:52:52","first",0,216
-4936,1576,6563,"angstrom",6811,"angstrom",10971,"km/s",18,"arcsecond",350,"Mpc","2024-07-31 17:42:43","first",0,216
-4937,1576,6563,"angstrom",6811,"angstrom",11336,"km/s",34,"arcsecond",185,"Mpc","2024-07-31 18:15:35","first",0,216
+4879,1576,6565,"angstrom",7315,"angstrom",34375,"km/s",37,"arcsecond",170,"Mpc","2024-10-25 16:41:36","first",0,215
+4879,1576,6565,"angstrom",6189,"angstrom",-17096,"km / s",37,"arcsecond",170,"Mpc","2024-10-25 20:13:54","second",0,215
+4899,1576,6565,"angstrom",6899,"angstrom",15359,"km/s",42,"arcsecond",150,"Mpc","2024-07-29 17:45:57","first",0,215
+5000,1576,6565,"angstrom",6814,"angstrom",11473,"km / s",39,"arcsecond","","Mpc","2024-09-24 16:01:23","first",0,215
+5018,1576,6565,"angstrom",7079,"angstrom",23587,"km / s",41,"arcsecond",154,"Mpc","2024-10-04 21:33:02","first",0,215
+5018,1576,6565,"angstrom",6803,"angstrom",10971,"km / s",42,"arcsecond",148,"Mpc","2024-10-04 21:37:36","second",0,215
+5030,1576,6565,"angstrom",6990,"angstrom",19519,"km / s",37,"arcsecond",170,"Mpc","2024-10-08 18:45:09","first",0,215
+5030,1576,6565,"angstrom",6990,"angstrom",19519,"km / s",37,"arcsecond",170,"Mpc","2024-10-08 18:45:12","second",0,215
+4914,1576,6565,"angstrom",6809,"angstrom",11245,"km/s",33,"arcsecond",191,"Mpc","2024-07-31 17:55:27","first",0,216
+4915,1576,6565,"angstrom",8400,"angstrom",11336,"km/s",43,"arcsecond",147,"Mpc","2024-07-31 17:56:25","first",0,216
+4916,1576,6565,"angstrom",6836,"angstrom",12479,"km/s",35,"arcsecond",180,"Mpc","2024-07-31 17:58:42","first",0,216
+4917,1576,6565,"angstrom",6811,"angstrom",11336,"km/s",34,"arcsecond",191,"Mpc","2024-07-31 17:52:21","first",0,216
+4918,1576,6565,"angstrom",6831,"angstrom",12250,"km/s",1600,"arcsecond",4,"Mpc","2024-07-31 17:45:00","first",0,216
+4919,1576,6565,"angstrom",6809,"angstrom",11245,"km/s",29,"arcsecond",217,"Mpc","2024-07-31 18:22:48","first",0,216
+4920,1576,6565,"angstrom",6823,"angstrom",11885,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 17:31:17","first",0,216
+4921,1576,6565,"angstrom",6808,"angstrom",11199,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 18:20:11","first",0,216
+4922,1576,6565,"angstrom",6812,"angstrom",11382,"km/s",80,"arcsecond",79,"Mpc","2024-07-31 17:56:49","first",0,216
+4923,1576,6565,"angstrom",6808,"angstrom",11199,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 17:41:04","first",0,216
+4924,1576,6565,"angstrom",6812,"angstrom",11382,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 18:04:34","first",0,216
+4926,1576,6565,"angstrom",6828,"angstrom",12113,"km/s",33,"arcsecond",191,"Mpc","2024-07-31 18:12:59","first",0,216
+4927,1576,6565,"angstrom",6806,"angstrom",11108,"km/s",25,"arcsecond",252,"Mpc","2024-07-31 17:43:30","first",0,216
+4928,1576,6565,"angstrom",6806,"angstrom",11336,"km/s",32,"arcsecond",197,"Mpc","2024-07-31 18:13:10","first",0,216
+4930,1576,6565,"angstrom",6803,"angstrom",10971,"km/s",30,"arcsecond",210,"Mpc","2024-07-31 18:05:21","first",0,216
+4931,1576,6565,"angstrom",6809,"angstrom",11245,"km/s",85,"arcsecond",74,"Mpc","2024-07-31 17:31:05","first",0,216
+4932,1576,6565,"angstrom",6811,"angstrom",11336,"km/s",17,"arcsecond",371,"Mpc","2024-07-31 17:41:16","first",0,216
+4933,1576,6565,"angstrom",6808,"angstrom",11199,"km/s",32,"arcsecond",203,"Mpc","2024-07-31 18:00:30","first",0,216
+4934,1576,6565,"angstrom",6811,"angstrom",11336,"km/s",157,"arcsecond",40,"Mpc","2024-07-31 17:36:11","first",0,216
+4935,1576,6565,"angstrom",6803,"angstrom",46,"km/s",35,"arcsecond",180,"Mpc","2024-07-31 17:52:52","first",0,216
+4936,1576,6565,"angstrom",6811,"angstrom",10971,"km/s",18,"arcsecond",350,"Mpc","2024-07-31 17:42:43","first",0,216
+4937,1576,6565,"angstrom",6811,"angstrom",11336,"km/s",34,"arcsecond",185,"Mpc","2024-07-31 18:15:35","first",0,216
