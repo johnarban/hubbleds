@@ -6,7 +6,7 @@ from numpy import argsort, array, pi
 from cosmicds.utils import component_type_for_field, mode, percent_around_center_indices
 from pydantic import BaseModel
 
-from glue.core import Data
+from glue.core import Data, Component
 from glue_jupyter.app import JupyterApplication
 from numbers import Number
 from typing import List, Set, Tuple, TypeVar, Optional, cast, Any
@@ -170,7 +170,11 @@ def models_to_glue_data(items: List[M],
         for field, info in t.model_fields.items():
             if field not in ignore:
                 component_type = component_type_for_field(info)
-                data_dict[field] = component_type(array([getattr(m, field) for m in items]))
+                if field.endswith('_value') and component_type is Component:
+                    print(field, array([getattr(m, field) or 999 for m in items]))
+                    data_dict[field] = component_type(array([getattr(m, field) or 999 for m in items]))
+                else:
+                    data_dict[field] = component_type(array([getattr(m, field) for m in items]))
     if label:
         data_dict["label"] = label
     return Data(**data_dict)
