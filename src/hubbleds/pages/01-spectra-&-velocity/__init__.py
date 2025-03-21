@@ -832,6 +832,11 @@ def Page():
                 #     DataTable(title="Example Measurements",
                 #             items=[x.model_dump() for x in LOCAL_STATE.value.example_measurements])
                 
+                solara.Text(f"Field: {DB_VELOCITY_FIELD}")
+                if EXAMPLE_GALAXY_SEED_DATA+'_first' in gjapp.data_collection:
+                    solara.Markdown(f"{gjapp.data_collection[EXAMPLE_GALAXY_SEED_DATA+'_first'].to_dataframe().head()[['measurement_number', 'obs_wave_value','velocity_value']].to_markdown()}")
+                if EXAMPLE_GALAXY_MEASUREMENTS in gjapp.data_collection:
+                    solara.Markdown(f"{gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS].to_dataframe().head()[['measurement_number', 'obs_wave_value','velocity_value']].to_markdown()}")
 
                 DataTable(
                     title="Example Galaxy",
@@ -1040,6 +1045,9 @@ def Page():
                         else:
                             ignore = [subset_by_label(gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS], "first measurement")]
                         ignore += [gjapp.data_collection[EXAMPLE_GALAXY_MEASUREMENTS]]
+                        solara.Text(f"Field: {DB_VELOCITY_FIELD}")
+                        solara.Markdown(f"{viewer_data[0].to_dataframe().head()[['measurement_number', 'obs_wave_value','velocity_value']].to_markdown()}")
+                        solara.Markdown(f"{viewer_data[1].to_dataframe().head()[['measurement_number', 'obs_wave_value','velocity_value']].to_markdown()}")
                         DotplotViewer(
                             gjapp,
                             title="Dotplot: Example Galaxy Velocities",

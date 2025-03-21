@@ -134,9 +134,11 @@ def DotplotViewer(
         def _add_data(viewer: PlotlyBaseView, data: Union[Data, tuple]):
             if isinstance(data, Data):
                 logger.info(f"{title}: Adding data: {data.label}")
+                logger.info(f"{title}: viewer_data: {data.to_dataframe()[['measurement_number', 'obs_wave_value','velocity_value']]}")
                 viewer.add_data(data)
             else:
                 logger.info(f"{title}: Adding data: {data.label}")
+                logger.info(f"{title}: viewer_data: {data.to_dataframe()[['measurement_number', 'obs_wave_value','velocity_value']]}")
                 viewer.add_data(data[0], layer_type=data[1])
 
         def _add_viewer():

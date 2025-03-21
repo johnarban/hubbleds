@@ -14,6 +14,7 @@ from typing import List
 
 from pathlib import Path
 from csv import DictReader
+from typing import cast, List
 
 logger = setup_logger("API")
 
@@ -21,7 +22,7 @@ from .data_management import DB_VELOCITY_FIELD
 from numpy.random import Generator, PCG64, SeedSequence
 from numpy import arange, asarray, ravel, column_stack
 from typing import Any
-from pandas import read_csv
+from pandas import read_csv, DataFrame
 
 from .data_management import ELEMENT_REST
 DEBOUNCE_TIMEOUT = 1
