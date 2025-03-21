@@ -75,6 +75,14 @@ class StudentMeasurement(BaseModel):
     measurement_number: str | None = None
     brightness: float = 0
     galaxy: Optional[GalaxyData] = None
+    
+    # # "_value" field None to 0
+    # @field_validator("obs_wave_value", "velocity_value", "ang_size_value", "est_dist_value", mode="after")
+    # def set_none_to_zero(cls, v):
+    #     if v is None:
+    #         return float('nan') # can't do this. get a "error saying JSON can't serialize out of range float"
+    #.        return 0 # 999, -999 
+    #     return v
 
     @computed_field
     @property
